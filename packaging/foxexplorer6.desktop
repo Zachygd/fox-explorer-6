@@ -1,0 +1,23 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Fox Explorer 6
+GenericName=Web Browser
+Comment=Browse the Web with the classic Internet Explorer 6 look
+Exec=foxexplorer6 %u
+Icon=foxexplorer6
+Terminal=false
+StartupNotify=true
+StartupWMClass=foxexplorer6
+Categories=Network;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;application/vnd.mozilla.xul+xml;x-scheme-handler/http;x-scheme-handler/https;
+Keywords=Internet;WWW;Browser;Web;Explorer;Firefox;
+Actions=new-window;new-private-window;
+
+[Desktop Action new-window]
+Name=New Window
+Exec=foxexplorer6 --new-window %u
+
+[Desktop Action new-private-window]
+Name=New Private Window
+Exec=foxexplorer6 --private-window %u

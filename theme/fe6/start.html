@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light dark">
+<title>Welcome to Fox Explorer 6</title>
+<link rel="icon" href="icons/foxexplorer.svg">
+<style>
+  :root {
+    --face: #c0c0c0; --hi: #fff; --light: #dfdfdf; --shadow: #808080; --dark: #000;
+    --text: #000; --window: #fff; --link: #0000ff; --cap1: #000080; --cap2: #1084d0; --desk: #008080;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --face: #3f3f3f; --hi: #6e6e6e; --light: #4c4c4c; --shadow: #1f1f1f; --dark: #000;
+            --text: #fff; --window: #000; --link: #8fb4ff; --cap1: #0b1a5c; --cap2: #1f5f99; --desk: #003f3f; }
+  }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--desk);
+    font: 12px "MS Sans Serif", "Microsoft Sans Serif", Tahoma, "Liberation Sans", Arial, sans-serif;
+    color: var(--text);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .win {
+    width: min(560px, calc(100% - 32px));
+    background: var(--face);
+    box-shadow: inset -1px -1px var(--dark), inset 1px 1px var(--light), inset -2px -2px var(--shadow), inset 2px 2px var(--hi);
+    padding: 3px;
+  }
+  .cap {
+    background: linear-gradient(to right, var(--cap1), var(--cap2));
+    color: #fff; font-weight: bold; padding: 3px 4px; display: flex; align-items: center; gap: 4px;
+  }
+  .cap img { width: 16px; height: 16px; }
+  .body { display: flex; gap: 16px; padding: 16px 14px 12px; }
+  .body > img { width: 64px; height: 64px; flex: none; }
+  h1 { font-size: 18px; margin: 0 0 8px; }
+  p { margin: 0 0 10px; line-height: 1.4; }
+  .well {
+    background: var(--window); padding: 8px 10px; margin-top: 4px;
+    box-shadow: inset -1px -1px var(--hi), inset 1px 1px var(--shadow), inset -2px -2px var(--light), inset 2px 2px var(--dark);
+  }
+  .well ul { margin: 0; padding-left: 18px; }
+  .well li { margin: 3px 0; }
+  a { color: var(--link); }
+  kbd { font: inherit; padding: 0 3px; box-shadow: inset -1px -1px var(--shadow), inset 1px 1px var(--hi); background: var(--face); }
+</style>
+</head>
+<body>
+  <div class="win" role="main">
+    <div class="cap"><img src="icons/foxexplorer.svg" alt="">Welcome to Fox Explorer 6</div>
+    <div class="body">
+      <img src="icons/foxexplorer.svg" alt="Fox Explorer 6 logo">
+      <div>
+        <h1>Welcome to Fox Explorer 6</h1>
+        <p>The classic browser look, running on a modern Firefox engine. Type an address or a search into the <b>Address</b> bar and click <b>Go</b>.</p>
+        <div class="well">
+          <ul>
+            <li><b>Tabs:</b> <kbd>Ctrl</kbd>+<kbd>T</kbd> opens a new tab, <kbd>Ctrl</kbd>+<kbd>W</kbd> closes it.</li>
+            <li><b>Favorites:</b> <kbd>Ctrl</kbd>+<kbd>D</kbd> adds this page; the <b>Favorites</b> button opens the list.</li>
+            <li><b>Add-ons:</b> Firefox extensions install from <a href="https://addons.mozilla.org/">addons.mozilla.org</a>.</li>
+            <li><b>Dark mode:</b> View &rsaquo; Color Scheme, or Tools &rsaquo; Internet Options.</li>
+            <li><b>Settings:</b> Tools &rsaquo; Internet Options opens all modern Firefox settings.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

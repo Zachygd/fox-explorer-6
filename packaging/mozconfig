@@ -1,0 +1,16 @@
+# Fox Explorer 6 — mozconfig for building from https://github.com/mozilla-firefox/firefox
+ac_add_options --enable-application=browser
+ac_add_options --enable-release
+ac_add_options --enable-optimize
+ac_add_options --with-branding=browser/branding/foxexplorer
+# installed binary / package name
+ac_add_options --with-app-name=foxexplorer6
+# own profile (~/.mozilla/foxexplorer6) and own window class; the app "Name" stays Firefox
+# so the user-agent and addons.mozilla.org see a normal Firefox
+ac_add_options MOZ_APP_PROFILE=mozilla/foxexplorer6
+ac_add_options MOZ_APP_REMOTINGNAME=foxexplorer6
+# updates come from re-running the build (or your package manager)
+ac_add_options --disable-updater
+ac_add_options --disable-crashreporter
+ac_add_options --disable-tests
+mk_add_options MOZ_OBJDIR=@TOPSRCDIR@/obj-foxexplorer6

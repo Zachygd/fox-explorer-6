@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>foxexplorer6</id>
+  <launchable type="desktop-id">foxexplorer6.desktop</launchable>
+  <name>Fox Explorer 6</name>
+  <summary>Firefox with the classic Internet Explorer 6 / Windows 98 look</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MPL-2.0</project_license>
+  <description>
+    <p>Fox Explorer 6 is an unofficial build of Mozilla Firefox restyled to look like Internet Explorer 6
+       on Windows 98, with light and dark colour schemes. Tabs, Firefox extensions and all modern settings work as usual.</p>
+  </description>
+  <categories><category>Network</category><category>WebBrowser</category></categories>
+</component>

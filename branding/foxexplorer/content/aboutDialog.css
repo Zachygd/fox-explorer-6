@@ -1,0 +1,21 @@
+/* Fox Explorer 6 About box — Windows 98 dialog colours */
+#aboutDialogContainer {
+  background-color: #c0c0c0;
+  color: #000;
+  color-scheme: light;
+  font: 11px "MS Sans Serif", "Microsoft Sans Serif", Tahoma, "Liberation Sans", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  #aboutDialogContainer { background-color: #3f3f3f; color: #fff; color-scheme: dark; }
+  #rightBox { filter: brightness(2.2); }
+}
+#rightBox {
+  background-size: auto 40px;
+  margin-inline: 24px;
+  padding-top: 56px;
+}
+#bottomBox {
+  padding: 12px 10px;
+  border-top: 1px solid #808080;
+  box-shadow: inset 0 1px #fff;
+}
