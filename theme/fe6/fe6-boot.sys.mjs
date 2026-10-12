@@ -70,7 +70,25 @@ const lazy = {
     }
     return cuiModule;
   },
+  /* The search service used to be Services.search; current Firefox (157+) has it as a plain
+     module (moz-src:///toolkit/components/search/SearchService.sys.mjs). */
+  get SearchService() {
+    if (!searchModule) {
+      try {
+        searchModule = Services.search || null;
+      } catch (e) {}
+      if (!searchModule) {
+        searchModule = ChromeUtils.importESModule(
+          "moz-src:///toolkit/components/search/SearchService.sys.mjs").SearchService;
+      }
+    }
+    return searchModule;
+  },
 };
+let searchModule = null;
+function userChangeReason(svc) {
+  return svc.CHANGE_REASON?.USER ?? Ci.nsISearchService?.CHANGE_REASON_USER ?? "user";
+}
 
 function getPref(name, def) {
   try {
@@ -252,8 +270,9 @@ function refreshEngines() {
   if (enginesLoading) return enginesLoading;
   enginesLoading = (async () => {
     try {
-      const list = await Services.search.getVisibleEngines();
-      const def = await Services.search.getDefault();
+      const svc = lazy.SearchService;
+      const list = await svc.getVisibleEngines();
+      const def = await svc.getDefault();
       const engines = [];
       for (const e of list) {
         let icon = "";
@@ -271,7 +290,14 @@ function refreshEngines() {
         if (popup) fillSearchMenu(w, popup);
       }
     } catch (e) {
-      log("search menu", e);
+      console.error("[Fox Explorer 6] could not load search engines", e);
+      if (!engineCache.engines.length) {
+        engineCache = { engines: [], current: "", failed: true };
+        for (const w of Services.wm.getEnumerator("navigator:browser")) {
+          const popup = w.document.getElementById("fe6-search-popup");
+          if (popup) fillSearchMenu(w, popup);
+        }
+      }
     } finally {
       enginesLoading = null;
     }
@@ -324,7 +350,8 @@ function fillSearchMenu(win, popup) {
   const focusBar = () => { win.gURLBar.focus(); win.gURLBar.select(); };
   const kids = [item("Search the Web…", focusBar, { "fe6-bold": "true" }), doc.createXULElement("menuseparator")];
   if (!engineCache.engines.length) {
-    kids.push(item("(loading search engines…)", () => {}, { disabled: "true" }));
+    kids.push(item(engineCache.failed ? "(no search engines found)" : "(loading search engines…)",
+                   () => {}, { disabled: "true" }));
   }
   for (const e of engineCache.engines) {
     const attrs = { class: "menuitem-iconic" };
@@ -335,7 +362,8 @@ function fillSearchMenu(win, popup) {
     }
     kids.push(item(e.name, async () => {
       try {
-        await Services.search.setDefault(e.engine, Ci.nsISearchService.CHANGE_REASON_USER);
+        const svc = lazy.SearchService;
+        await svc.setDefault(e.engine, userChangeReason(svc));
         engineCache.current = e.name;
       } catch (err) {
         log("setDefault", err);
