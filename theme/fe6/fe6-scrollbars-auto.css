@@ -1,0 +1,8 @@
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+/* Fox Explorer 6 — follow the desktop (registered for "Use System Setting") */
+@media (prefers-color-scheme: dark) {
+scrollbar, scrollcorner {
+    --fe-sb-face: #3f3f3f !important; --fe-sb-hi: #6e6e6e !important; --fe-sb-light: #4c4c4c !important; --fe-sb-shadow: #1f1f1f !important; --fe-sb-dark: #000000 !important;
+    --fe-sb-track: #3f3f3f !important; --fe-sb-dot: #2a2a2a !important; --fe-sb-arrow: #ffffff !important;
+}
+}

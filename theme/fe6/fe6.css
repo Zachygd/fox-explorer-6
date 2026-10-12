@@ -203,15 +203,15 @@ body, #browser { background: var(--fe-face) !important; color: var(--fe-text) !i
  * so Firefox's customisation, overflow and extension buttons keep working. */
 #nav-bar {
   background-image: var(--fe-gripper), var(--fe-gripper),
-                    linear-gradient(to bottom, transparent 41px, var(--fe-shadow) 41px 42px, var(--fe-hi) 42px 43px, transparent 43px) !important;
-  background-position: 3px 4px, 3px 46px, 0 0 !important;
+                    linear-gradient(to bottom, transparent 40px, var(--fe-shadow) 40px 41px, var(--fe-hi) 41px 42px, transparent 42px) !important;
+  background-position: 3px 4px, 3px 43px, 0 0 !important;
   background-size: 3px 34px, 3px 21px, 100% 100% !important;
   padding-block: 2px 2px !important;
 }
 #nav-bar-customization-target {
   flex-wrap: wrap !important;
   align-items: center !important;
-  row-gap: 5px !important;
+  row-gap: 2px !important;
 }
 #nav-bar-customization-target::after {        /* forces the row break before "Address" */
   content: "";
@@ -932,3 +932,42 @@ sidebar-main, #sidebar-main {
 }
 #nav-bar #downloads-indicator-icon { filter: var(--fe-cold-filter); }
 #nav-bar #downloads-button:not([disabled]):is(:hover, [open]) #downloads-indicator-icon { filter: none; }
+
+/* Firefox hides a spacer letter with font-size: 0; keep it hidden despite the Win98 font rule */
+.urlbar-visually-hidden { font-size: 0 !important; }
+
+/* Account button: hide Firefox's avatar image so only the Win98 icon shows */
+#fxa-toolbar-menu-button :is(.avatar-container, #fxa-avatar-image) { display: none !important; }
+#fxa-toolbar-menu-button > .toolbarbutton-badge-stack { display: flex !important; }
+
+/* The optional Search box you can add from Customize: its engine picker as a flat Win98
+   drop-down with a classic black arrow */
+#search-container .searchmode-switcher,
+#search-container #searchmode-switcher,
+:is(#searchbar, moz-urlbar[sap-name="searchbar"]) .searchmode-switcher {
+  display: flex !important;
+  --button-border-radius: 0px !important;
+  --button-background-color: transparent !important;
+  --button-background-color-hover: transparent !important;
+  --button-background-color-active: transparent !important;
+  --button-border-color: transparent !important;
+  --button-padding: 0 2px !important;
+  height: 18px !important; min-height: 18px !important;
+  margin: 0 2px 0 0 !important; padding: 0 !important;
+  border-radius: 0 !important; background: transparent !important; box-shadow: none !important;
+  align-self: center !important;
+}
+#search-container .searchmode-switcher::part(button) {
+  border-radius: 0 !important; border: 0 !important; background: transparent !important;
+  box-shadow: none !important; height: 18px !important; min-height: 18px !important; padding: 0 2px !important;
+}
+#search-container .searchmode-switcher:hover::part(button) { box-shadow: var(--fe-thin-raised) !important; }
+#search-container .searchmode-switcher:is([open], :hover:active)::part(button) { box-shadow: var(--fe-thin-sunken) !important; }
+#search-container :is(.searchmode-switcher-dropmarker, #searchmode-switcher-dropmarker) { display: none !important; }
+#search-container .searchmode-switcher-content::after {
+  content: "";
+  width: 7px; height: 4px; margin-inline-start: 3px;
+  background: conic-gradient(from -45deg at 50% 100%, var(--fe-wintext) 90deg, transparent 90deg);
+}
+#search-container :is(.searchmode-switcher-icon, #searchmode-switcher-icon) { width: 16px !important; height: 16px !important; border-radius: 0 !important; }
+#fe6-search-popup menuitem[fe6-bold] :is(.menu-text, .menu-iconic-text, label) { font-weight: bold !important; }

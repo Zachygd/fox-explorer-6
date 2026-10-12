@@ -212,10 +212,12 @@ function createWidgets() {
         btn.setAttribute("removable", "true");
         const popup = doc.createXULElement("menupopup");
         popup.id = "fe6-search-popup";
-        popup.addEventListener("popupshowing", async e => {
-          if (e.target != popup) return;
-          await fillSearchMenu(win, popup);
+        fillSearchMenu(win, popup);
+        popup.addEventListener("popupshowing", () => {
+          fillSearchMenu(win, popup);
+          refreshEngines();
         });
+        refreshEngines();
         btn.append(popup);
         return btn;
       },
@@ -264,51 +266,74 @@ function createWidgets() {
   } catch (e) { log("throbber widget", e); }
 }
 
-async function fillSearchMenu(win, popup) {
-  const doc = win.document;
-  popup.replaceChildren();
-  const head = doc.createXULElement("menuitem");
-  head.setAttribute("label", "Search the Web…");
-  head.setAttribute("style", "font-weight: bold");
-  head.addEventListener("command", () => { win.gURLBar.focus(); win.gURLBar.select(); });
-  popup.append(head, doc.createXULElement("menuseparator"));
-  let engines = [], current = null;
-  try {
-    engines = await Services.search.getVisibleEngines();
-    current = await Services.search.getDefault();
-  } catch (e) {
-    log("search engines", e);
-  }
-  for (const engine of engines) {
-    const mi = doc.createXULElement("menuitem");
-    mi.setAttribute("type", "radio");
-    mi.setAttribute("name", "fe6-engine");
-    mi.setAttribute("label", engine.name);
-    if (current && engine.name == current.name) {
-      mi.setAttribute("checked", "true");
-      mi.setAttribute("style", "font-weight: bold");
-      mi.setAttribute("tooltiptext", "Current search engine");
-    }
-    mi.classList.add("menuitem-iconic");
+/* Search engines are cached (with their icons) so the menu can be built synchronously:
+   async work inside popupshowing left the menu empty on some Firefox versions. */
+let engineCache = { engines: [], current: "" };
+let enginesLoading = null;
+function refreshEngines() {
+  if (enginesLoading) return enginesLoading;
+  enginesLoading = (async () => {
     try {
-      const icon = typeof engine.getIconURL == "function" ? await engine.getIconURL(16) : engine.iconURI?.spec;
-      if (icon) mi.setAttribute("image", icon);
-    } catch (e) {}
-    mi.addEventListener("command", async () => {
-      try {
-        await Services.search.setDefault(engine, Ci.nsISearchService.CHANGE_REASON_USER);
-      } catch (e) {
-        log("setDefault", e);
+      const list = await Services.search.getVisibleEngines();
+      const def = await Services.search.getDefault();
+      const engines = [];
+      for (const e of list) {
+        let icon = "";
+        try {
+          icon = typeof e.getIconURL == "function" ? (await e.getIconURL(16)) || "" : e.iconURI?.spec || "";
+        } catch (err) {}
+        engines.push({ name: e.name, icon, engine: e });
       }
-      win.gURLBar.focus();
-      win.gURLBar.select();
-    });
-    popup.append(mi);
+      const sig = c => c.current + "|" + c.engines.map(x => x.name + x.icon).join(",");
+      const next = { engines, current: def?.name || "" };
+      if (sig(next) === sig(engineCache)) return;   // nothing changed: leave open menus alone
+      engineCache = next;
+      for (const w of Services.wm.getEnumerator("navigator:browser")) {
+        const popup = w.document.getElementById("fe6-search-popup");
+        if (popup) fillSearchMenu(w, popup);
+      }
+    } catch (e) {
+      log("search menu", e);
+    } finally {
+      enginesLoading = null;
+    }
+  })();
+  return enginesLoading;
+}
+
+function fillSearchMenu(win, popup) {
+  const doc = win.document;
+  const item = (label, fn, extra = {}) => {
+    const mi = doc.createXULElement("menuitem");
+    mi.setAttribute("label", label);
+    for (const [k, v] of Object.entries(extra)) mi.setAttribute(k, v);
+    mi.addEventListener("command", fn);
+    return mi;
+  };
+  const focusBar = () => { win.gURLBar.focus(); win.gURLBar.select(); };
+  const kids = [item("Search the Web…", focusBar, { "fe6-bold": "true" }), doc.createXULElement("menuseparator")];
+  if (!engineCache.engines.length) {
+    kids.push(item("(loading search engines…)", () => {}, { disabled: "true" }));
   }
-  const manage = doc.createXULElement("menuitem");
-  manage.setAttribute("label", "Manage Search Engines…");
-  manage.addEventListener("command", () => win.openPreferences("paneSearch"));
-  popup.append(doc.createXULElement("menuseparator"), manage);
+  for (const e of engineCache.engines) {
+    const attrs = { class: "menuitem-iconic" };
+    if (e.icon) attrs.image = e.icon;
+    if (e.name === engineCache.current) {
+      attrs["fe6-bold"] = "true";
+      attrs.tooltiptext = "Current search engine";
+    }
+    kids.push(item(e.name, async () => {
+      try {
+        await Services.search.setDefault(e.engine, Ci.nsISearchService.CHANGE_REASON_USER);
+        engineCache.current = e.name;
+      } catch (err) {
+        log("setDefault", err);
+      }
+      focusBar();
+    }, attrs));
+  }
+  kids.push(doc.createXULElement("menuseparator"), item("Manage Search Engines…", () => win.openPreferences("paneSearch")));
+  popup.replaceChildren(...kids);
 }
 
 /* One-time default layout (IE6 Standard Buttons). Re-run by setting foxexplorer.layoutVersion to 0. */
@@ -715,8 +740,18 @@ function injectPreferences(win) {
 function registerGlobalSheets() {
   try {
     const sss = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService);
-    const uri = Services.io.newURI("resource://fe6/fe6-scrollbars.css");
-    if (!sss.sheetRegistered(uri, sss.AGENT_SHEET)) sss.loadAndRegisterSheet(uri, sss.AGENT_SHEET);
+    const uri = name => Services.io.newURI("resource://fe6/" + name);
+    const base = uri("fe6-scrollbars.css");
+    if (!sss.sheetRegistered(base, sss.AGENT_SHEET)) sss.loadAndRegisterSheet(base, sss.AGENT_SHEET);
+    // colours follow Fox Explorer's own setting (not Firefox's guess from the desktop)
+    const scheme = getPref(PREF.scheme, "light");
+    const want = scheme === "dark" ? "fe6-scrollbars-dark.css" : scheme === "system" ? "fe6-scrollbars-auto.css" : null;
+    for (const name of ["fe6-scrollbars-dark.css", "fe6-scrollbars-auto.css"]) {
+      const u = uri(name);
+      const has = sss.sheetRegistered(u, sss.AGENT_SHEET);
+      if (name === want && !has) sss.loadAndRegisterSheet(u, sss.AGENT_SHEET);
+      if (name !== want && has) sss.unregisterSheet(u, sss.AGENT_SHEET);
+    }
   } catch (e) {
     console.error("[Fox Explorer 6] scroll bar sheet failed", e);
   }
@@ -769,11 +804,15 @@ export const FoxExplorer6 = {
 
     const prefObserver = {
       observe(subject, topic, data) {
-        if (data === PREF.scheme) applyGlobalScheme();
+        if (data === PREF.scheme) {
+          applyGlobalScheme();
+          registerGlobalSheets();
+        }
         if (data === PREF.caption) syncTitlebarPref();
         for (const w of Services.wm.getEnumerator("navigator:browser")) syncWindowAttrs(w);
       },
     };
     Services.prefs.addObserver("foxexplorer.", prefObserver);
+    Services.obs.addObserver(() => refreshEngines(), "browser-search-engine-modified");
   },
 };

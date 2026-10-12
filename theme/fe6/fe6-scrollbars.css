@@ -1,6 +1,7 @@
 /* Fox Explorer 6 — Windows 98 scroll bars, for web pages and the browser UI alike.
    Registered once as a global AGENT sheet (scroll bar parts are anonymous content that
-   ordinary page styles can't reach). Light/dark follows prefers-color-scheme. */
+   ordinary page styles can't reach). These are the light colours; Fox Explorer adds
+   fe6-scrollbars-dark.css (dark mode) or fe6-scrollbars-auto.css (Use System Setting). */
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
 /* Note: the <scrollbar> box itself must keep its native appearance (it supplies the size);
@@ -15,12 +16,6 @@ scrollbar, scrollcorner {
 }
 scrollbar slider {
   background: repeating-conic-gradient(var(--fe-sb-dot) 0 25%, var(--fe-sb-track) 0 50%) 0 0 / 2px 2px !important;
-}
-@media (prefers-color-scheme: dark) {
-  scrollbar, scrollcorner {
-    --fe-sb-face: #3f3f3f; --fe-sb-hi: #6e6e6e; --fe-sb-light: #4c4c4c; --fe-sb-shadow: #1f1f1f; --fe-sb-dark: #000000;
-    --fe-sb-track: #3f3f3f; --fe-sb-dot: #2a2a2a; --fe-sb-arrow: #ffffff;
-  }
 }
 scrollbar thumb {
   background: var(--fe-sb-face) !important;
