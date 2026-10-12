@@ -884,8 +884,35 @@ function patchProfileLaunching() {
     }
     sps.fe6Patched = true;
     log("profile launches will use", ours.join(" "));
+    patchProfilePages(sps);
   } catch (e) {
     log("profile launching", e);
+  }
+}
+
+/* about:editprofile and about:deleteprofile assume the profile group database is already
+   open. about:profilemanager opens it (maybeSetupDataStore), but the edit/delete pages
+   don't, so reaching them first (e.g. from File › Profiles) left them blank with
+   "currentProfile is null". Open it on their behalf before their first request. */
+function patchProfilePages(sps) {
+  try {
+    const mod = ChromeUtils.importESModule("resource:///actors/ProfilesParent.sys.mjs");
+    const proto = mod?.ProfilesParent?.prototype;
+    if (!proto || proto.fe6Patched || typeof proto.receiveMessage != "function") return;
+    const receive = proto.receiveMessage;
+    proto.receiveMessage = async function (message) {
+      if (!sps.currentProfile && typeof sps.maybeSetupDataStore == "function") {
+        try {
+          await sps.maybeSetupDataStore();
+        } catch (e) {
+          console.error("[Fox Explorer 6] couldn't open the profile group", e);
+        }
+      }
+      return receive.call(this, message);
+    };
+    proto.fe6Patched = true;
+  } catch (e) {
+    log("profile pages", e);
   }
 }
 
