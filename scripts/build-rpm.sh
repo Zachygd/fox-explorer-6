@@ -8,6 +8,8 @@ command -v rpmbuild >/dev/null || { echo "rpmbuild missing: sudo dnf install rpm
 TOP="$HERE/work/rpmbuild"; rm -rf "$TOP"; mkdir -p "$TOP"/{SOURCES,SPECS,BUILD,RPMS,SRPMS}
 cp "$TARBALL" "$TOP/SOURCES/"
 RPMVER="${VERSION//-/.}"; RPMVER="${RPMVER//esr/}"
+# Mozilla's prebuilt libraries carry RUNPATHs Fedora's check-rpaths dislikes (see the spec)
+export QA_RPATHS=$(( 0x0001 | 0x0002 | 0x0004 | 0x0008 | 0x0010 | 0x0020 ))
 rpmbuild -bb "$HERE/packaging/foxexplorer6.spec" \
   --define "_topdir $TOP" \
   --define "fe_version $RPMVER" \

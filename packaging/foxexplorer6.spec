@@ -7,6 +7,9 @@
 %global debug_package %{nil}
 %global __strip /bin/true
 %global _build_id_links none
+# Mozilla's prebuilt libonnxruntime.so has a harmless but unusual RUNPATH ("$") that
+# Fedora's check-rpaths rejects; the libraries are loaded from the app directory anyway.
+%global __brp_check_rpaths %{nil}
 
 Name:           foxexplorer6
 Version:        %{fe_version}
