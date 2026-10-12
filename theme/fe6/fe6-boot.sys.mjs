@@ -3,6 +3,8 @@
  * public Firefox chrome APIs (CustomizableUI, gBrowser, StatusPanel, prefs), so extensions,
  * tabs, customise mode and about:preferences keep working. */
 
+import { setTimeout, clearTimeout } from "resource://gre/modules/Timer.sys.mjs";
+
 const CSS_URI = "resource://fe6/fe6.css";
 const AGENT_CSS_URI = "resource://fe6/fe6-agent.css";
 const CHROME_CSS_URI = "resource://fe6/fe6-chrome.css";
@@ -262,41 +264,67 @@ function createWidgets() {
   } catch (e) { log("throbber widget", e); }
 }
 
-/* Search engines are cached (with their icons) so the menu can be built synchronously:
-   async work inside popupshowing left the menu empty on some Firefox versions. */
+/* Search engines are cached so the menu can be built synchronously (async work inside
+   popupshowing left the menu empty on some Firefox versions). The list is published as
+   soon as it is known; icons are filled in afterwards, because current Firefox fetches
+   engine icons on demand and one slow icon must never hold up the whole menu. */
 let engineCache = { engines: [], current: "" };
 let enginesLoading = null;
+const iconCache = new Map();   // engine name -> icon URL
+
+function withTimeout(promise, ms) {
+  let timer;
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => { timer = setTimeout(() => reject(new Error("timed out")), ms); }),
+  ]).finally(() => clearTimeout(timer));
+}
+
+function rebuildSearchMenus() {
+  for (const w of Services.wm.getEnumerator("navigator:browser")) {
+    const popup = w.document.getElementById("fe6-search-popup");
+    if (popup) {
+      try { fillSearchMenu(w, popup); } catch (e) { console.error("[Fox Explorer 6] search menu", e); }
+    }
+  }
+}
+
+function engineIcon(e) {
+  if (typeof e.getIconURL == "function") return e.getIconURL(16);
+  return Promise.resolve(e.iconURI?.spec || "");
+}
+
 function refreshEngines() {
   if (enginesLoading) return enginesLoading;
   enginesLoading = (async () => {
     try {
       const svc = lazy.SearchService;
-      const list = await svc.getVisibleEngines();
-      const def = await svc.getDefault();
-      const engines = [];
-      for (const e of list) {
-        let icon = "";
-        try {
-          icon = typeof e.getIconURL == "function" ? (await e.getIconURL(16)) || "" : e.iconURI?.spec || "";
-        } catch (err) {}
-        engines.push({ name: e.name, icon, engine: e });
-      }
+      const [list, def] = await withTimeout(Promise.all([svc.getVisibleEngines(), svc.getDefault()]), 15000);
+      const engines = list.map(e => ({ name: e.name, icon: iconCache.get(e.name) || "", engine: e }));
       const sig = c => c.current + "|" + c.engines.map(x => x.name + x.icon).join(",");
       const next = { engines, current: def?.name || "" };
-      if (sig(next) === sig(engineCache)) return;   // nothing changed: leave open menus alone
-      engineCache = next;
-      for (const w of Services.wm.getEnumerator("navigator:browser")) {
-        const popup = w.document.getElementById("fe6-search-popup");
-        if (popup) fillSearchMenu(w, popup);
+      if (sig(next) !== sig(engineCache)) {   // unchanged: leave open menus alone
+        engineCache = next;
+        rebuildSearchMenus();
       }
+      // icons, in parallel and each with its own time limit
+      let gotNew = false;
+      await Promise.all(engines.map(async entry => {
+        try {
+          const url = (await withTimeout(engineIcon(entry.engine), 5000)) || "";
+          if (url && url !== entry.icon) {
+            entry.icon = url;
+            iconCache.set(entry.name, url);
+            gotNew = true;
+          }
+        } catch (err) {}
+      }));
+      if (gotNew && engineCache.engines === engines) rebuildSearchMenus();
     } catch (e) {
       console.error("[Fox Explorer 6] could not load search engines", e);
       if (!engineCache.engines.length) {
         engineCache = { engines: [], current: "", failed: true };
-        for (const w of Services.wm.getEnumerator("navigator:browser")) {
-          const popup = w.document.getElementById("fe6-search-popup");
-          if (popup) fillSearchMenu(w, popup);
-        }
+        rebuildSearchMenus();
       }
     } finally {
       enginesLoading = null;
@@ -811,6 +839,56 @@ function registerGlobalSheets() {
 
 /* ------------------------------------------------------------------ bootstrap */
 let started = false;
+/* Firefox's profile manager (File › Profiles, about:profilemanager) starts other profiles by
+   running the firefox binary with just --profile. Fox Explorer itself runs as
+   `firefox -app browser/foxexplorer6.ini`, which is what gives it its own profile group,
+   window class and remoting name; without -app the new window can't find its profile and
+   the profile pages come up blank. Add our launch arguments to every such relaunch. */
+function patchProfileLaunching() {
+  try {
+    const ini = Services.dirsvc.get("GreD", Ci.nsIFile);
+    ini.append("browser");
+    ini.append("foxexplorer6.ini");
+    if (!ini.exists()) return;
+    const appData = Services.dirsvc.get("UAppData", Ci.nsIFile).path;
+    if (!/foxexplorer6\/?$/.test(appData)) return;   // this process wasn't started via -app
+    let mod = null;
+    for (const url of ["resource:///modules/profiles/SelectableProfileService.sys.mjs",
+                       "moz-src:///browser/components/profiles/SelectableProfileService.sys.mjs"]) {
+      try {
+        mod = ChromeUtils.importESModule(url);
+        break;
+      } catch (e) {}
+    }
+    const sps = mod?.SelectableProfileService;
+    if (!sps || sps.fe6Patched) return;
+    const ours = ["-app", ini.path, "--name", "foxexplorer6", "--class", "foxexplorer6"];
+    const withOurs = args => [...ours, ...args.filter((a, i, all) => !(a === "-app" || all[i - 1] === "-app"))];
+    if (typeof sps.execProcess == "function") {
+      // Firefox 140+: every relaunch goes through execProcess(args)
+      const exec = sps.execProcess.bind(sps);
+      sps.execProcess = args => exec(withOurs(args));
+    } else if (typeof sps.getExecutableProcess == "function") {
+      // older: launchInstance() runs getExecutableProcess().runw(false, args, n)
+      const getProc = sps.getExecutableProcess.bind(sps);
+      sps.getExecutableProcess = () => {
+        const proc = getProc();
+        return {
+          runw: (blocking, args) => { const a = withOurs(args); proc.runw(blocking, a, a.length); },
+          run: (blocking, args) => { const a = withOurs(args); proc.run(blocking, a, a.length); },
+          get pid() { return proc.pid; },
+        };
+      };
+    } else {
+      return;
+    }
+    sps.fe6Patched = true;
+    log("profile launches will use", ours.join(" "));
+  } catch (e) {
+    log("profile launching", e);
+  }
+}
+
 export const FoxExplorer6 = {
   init() {
     if (started) return;
@@ -839,7 +917,7 @@ export const FoxExplorer6 = {
 
     Services.obs.addObserver(win => {
       // each step on its own, so a change in one Firefox version can't take out the rest
-      for (const [name, step] of [["commands", () => installCommands(win)], ["widgets", createWidgets], ["layout", applyDefaultLayout], ["window", () => initWindow(win)]]) {
+      for (const [name, step] of [["commands", () => installCommands(win)], ["profiles", patchProfileLaunching], ["widgets", createWidgets], ["layout", applyDefaultLayout], ["window", () => initWindow(win)]]) {
         try {
           step();
         } catch (e) {
