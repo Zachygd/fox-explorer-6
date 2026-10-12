@@ -15,10 +15,30 @@ const PREF = {
 const LAYOUT_VERSION = 1;
 const XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
-const lazy = {};
-ChromeUtils.defineESModuleGetters(lazy, {
-  CustomizableUI: "resource:///modules/CustomizableUI.sys.mjs",
-});
+/* CustomizableUI moved from resource:///modules/ to moz-src:/// around Firefox 150;
+   try the current location first, then the old one. */
+const CUI_URLS = [
+  "moz-src:///browser/components/customizableui/CustomizableUI.sys.mjs",
+  "resource:///modules/CustomizableUI.sys.mjs",
+];
+let cuiModule = null;
+const lazy = {
+  get CustomizableUI() {
+    if (!cuiModule) {
+      let lastErr;
+      for (const url of CUI_URLS) {
+        try {
+          cuiModule = ChromeUtils.importESModule(url).CustomizableUI;
+          if (cuiModule) break;
+        } catch (e) {
+          lastErr = e;
+        }
+      }
+      if (!cuiModule) throw lastErr || new Error("CustomizableUI not found");
+    }
+    return cuiModule;
+  },
+};
 
 function getPref(name, def) {
   try {
@@ -173,7 +193,7 @@ function applyDefaultLayout() {
     CUI.beginBatchUpdate();
     const nav = CUI.AREA_NAVBAR;
     // remove modern defaults that IE6 never had (they stay in the Customize palette)
-    for (const id of ["stop-reload-button", "fxa-toolbar-menu-button", "save-to-pocket-button",
+    for (const id of ["stop-reload-button", "fxa-toolbar-menu-button", "save-to-pocket-button", "sidebar-button",
                       "firefox-view-button", "vertical-spacer", "alltabs-button"]) {
       try {
         const p = CUI.getPlacementOfWidget(id);
@@ -433,11 +453,14 @@ function buildMenus(win) {
 function initWindow(win) {
   const doc = win.document;
   if (doc.documentElement.getAttribute("windowtype") !== "navigator:browser") return;
+  for (const [name, fn] of [["attrs", syncWindowAttrs], ["caption", buildCaption], ["statusbar", buildStatusBar], ["menus", buildMenus]]) {
+    try {
+      fn(win);
+    } catch (e) {
+      console.error(`[Fox Explorer 6] ${name} failed`, e);
+    }
+  }
   try {
-    syncWindowAttrs(win);
-    buildCaption(win);
-    buildStatusBar(win);
-    buildMenus(win);
     // follow desktop light/dark changes while in "system" mode
     const mq = win.matchMedia("(prefers-color-scheme: dark)");
     mq.addEventListener("change", () => syncWindowAttrs(win));
@@ -530,9 +553,14 @@ export const FoxExplorer6 = {
     }, "document-element-inserted");
 
     Services.obs.addObserver(win => {
-      createWidgets();
-      applyDefaultLayout();
-      initWindow(win);
+      // each step on its own, so a change in one Firefox version can't take out the rest
+      for (const [name, step] of [["widgets", createWidgets], ["layout", applyDefaultLayout], ["window", () => initWindow(win)]]) {
+        try {
+          step();
+        } catch (e) {
+          console.error(`[Fox Explorer 6] ${name} step failed`, e);
+        }
+      }
     }, "browser-delayed-startup-finished");
 
     const syncTitlebarPref = () => {
