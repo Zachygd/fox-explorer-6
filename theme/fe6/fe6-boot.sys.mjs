@@ -44,7 +44,7 @@ const PREF = {
   appMenu: "foxexplorer.showAppMenu",
   layout: "foxexplorer.layoutVersion",     // int, user pref: which default layout has been applied
 };
-const LAYOUT_VERSION = 2;
+const LAYOUT_VERSION = 3;
 const XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
 /* CustomizableUI moved from resource:///modules/ to moz-src:/// around Firefox 150;
@@ -129,6 +129,7 @@ const FE6_COMMANDS = {
     if (win.gURLBar.value) win.gURLBar.handleCommand(ev);
     else win.gURLBar.focus();
   },
+  "fe6-cmd-search": win => openSearchMenu(win),
   "fe6-cmd-refresh": (win, ev) => {
     const bypass = ev && (ev.shiftKey || ev.ctrlKey);
     const id = bypass ? "Browser:ReloadSkipCache" : "Browser:Reload";
@@ -140,6 +141,7 @@ const FE6_COMMANDS = {
 const BUTTON_COMMANDS = {
   "fe6-stop-button": "Browser:Stop",
   "fe6-refresh-button": "fe6-cmd-refresh",
+  "fe6-search-button": "fe6-cmd-search",
   "fe6-favorites-button": "fe6-cmd-favorites",
   "fe6-history-button": "fe6-cmd-history",
   "fe6-mail-button": "Browser:SendLink",
@@ -195,34 +197,10 @@ function createWidgets() {
   button("fe6-print-button", "Print", "Print");
   button("fe6-go-button", "Go", "Go to the address in the Address bar");
 
-  /* Search: a drop-down of the installed search engines (replaces the picker that used to
-     sit inside the Address bar). Picking one makes it the default and puts the cursor in
-     the Address bar, ready to type. */
-  try {
-    CUI.createWidget({
-      id: "fe6-search-button", type: "custom", removable: true, defaultArea: null, label: "Search",
-      onBuild(doc) {
-        const win = doc.ownerGlobal;
-        const btn = doc.createXULElement("toolbarbutton");
-        btn.id = "fe6-search-button";
-        btn.className = "toolbarbutton-1 chromeclass-toolbar-additional";
-        btn.setAttribute("type", "menu");
-        btn.setAttribute("label", "Search");
-        btn.setAttribute("tooltiptext", "Choose a search engine");
-        btn.setAttribute("removable", "true");
-        const popup = doc.createXULElement("menupopup");
-        popup.id = "fe6-search-popup";
-        fillSearchMenu(win, popup);
-        popup.addEventListener("popupshowing", () => {
-          fillSearchMenu(win, popup);
-          refreshEngines();
-        });
-        refreshEngines();
-        btn.append(popup);
-        return btn;
-      },
-    });
-  } catch (e) { log("search widget", e); }
+  /* Search: an ordinary IE6 button (icon + label, beside Favorites) that drops down a menu
+     of the installed search engines. Picking one makes it the default and puts the cursor in
+     the Address bar, ready to type. The menu lives in #mainPopupSet, see openSearchMenu(). */
+  button("fe6-search-button", "Search", "Choose a search engine");
 
   try {
     CUI.createWidget({
@@ -301,6 +279,39 @@ function refreshEngines() {
   return enginesLoading;
 }
 
+function openSearchMenu(win) {
+  const doc = win.document;
+  let popup = doc.getElementById("fe6-search-popup");
+  if (!popup) {
+    popup = doc.createXULElement("menupopup");
+    popup.id = "fe6-search-popup";
+    popup.addEventListener("popupshowing", ev => {
+      if (ev.target !== popup) return;
+      fillSearchMenu(win, popup);
+      refreshEngines();
+    });
+    popup.addEventListener("popuphidden", ev => {
+      if (ev.target !== popup) return;
+      doc.getElementById("fe6-search-button")?.removeAttribute("open");
+    });
+    (doc.getElementById("mainPopupSet") || doc.documentElement).append(popup);
+  }
+  if (popup.state === "open" || popup.state === "showing") {
+    popup.hidePopup();
+    return;
+  }
+  fillSearchMenu(win, popup);
+  refreshEngines();
+  const btn = doc.getElementById("fe6-search-button");
+  const visible = btn && btn.getBoundingClientRect().width > 0 && !btn.closest("#widget-overflow, #customization-palette");
+  if (visible) {
+    btn.setAttribute("open", "true");
+    popup.openPopup(btn, "after_start");
+  } else {
+    popup.openPopup(win.gURLBar?.inputField || doc.getElementById("urlbar"), "after_start");
+  }
+}
+
 function fillSearchMenu(win, popup) {
   const doc = win.document;
   const item = (label, fn, extra = {}) => {
@@ -338,8 +349,21 @@ function fillSearchMenu(win, popup) {
 
 /* One-time default layout (IE6 Standard Buttons). Re-run by setting foxexplorer.layoutVersion to 0. */
 function applyDefaultLayout() {
-  if (getPref(PREF.layout, 0) >= LAYOUT_VERSION) return;
+  const have = getPref(PREF.layout, 0);
+  if (have >= LAYOUT_VERSION) return;
   const CUI = lazy.CustomizableUI;
+  if (have === 2) {
+    /* v2 -> v3: the Search button was briefly a different kind of widget and could drop off
+       the toolbar; put it back beside Favorites without touching the rest of the layout. */
+    try {
+      if (!CUI.getPlacementOfWidget("fe6-search-button")) {
+        const fav = CUI.getPlacementOfWidget("fe6-favorites-button");
+        if (fav) CUI.addWidgetToArea("fe6-search-button", fav.area, fav.position);
+      }
+    } catch (e) { log("layout migration", e); }
+    Services.prefs.setIntPref(PREF.layout, LAYOUT_VERSION);
+    return;
+  }
   try {
     CUI.beginBatchUpdate();
     const nav = CUI.AREA_NAVBAR;
