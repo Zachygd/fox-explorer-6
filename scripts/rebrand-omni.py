@@ -10,11 +10,41 @@ Only branding resources change: names in brand.ftl/brand.properties, logos, icon
 the branding prefs. Everything else in omni.ja is copied byte-for-byte.
 (Self-built source builds don't need this script: they use --with-branding.)
 """
+import io
 import os
 import re
 import shutil
+import struct
 import sys
 import zipfile
+
+
+def open_jar(path):
+    """Open omni.ja whether it is a plain zip or a Mozilla "optimized" jar.
+
+    Official Mozilla builds store the central directory at the *start* of the file
+    (after a 4-byte read-ahead header) instead of just before the end record, which
+    Python's zipfile can't follow. We append a copy of the central directory plus a
+    new end record pointing at it; the local file headers are untouched, so every
+    offset inside the directory stays valid.
+    """
+    with open(path, "rb") as f:
+        data = f.read()
+    try:
+        return zipfile.ZipFile(io.BytesIO(data))
+    except zipfile.BadZipFile:
+        pass
+    eocd = data.rfind(b"PK\x05\x06")
+    if eocd < 0:
+        raise zipfile.BadZipFile(f"{path}: no end-of-central-directory record")
+    (sig, disk, cd_disk, n_disk, n_total, cd_size, cd_offset, comment_len) = struct.unpack(
+        "<IHHHHIIH", data[eocd:eocd + 22])
+    cd = data[cd_offset:cd_offset + cd_size]
+    if cd[:4] != b"PK\x01\x02":
+        raise zipfile.BadZipFile(f"{path}: central directory not found at offset {cd_offset}")
+    new_offset = len(data)
+    end = struct.pack("<IHHHHIIH", sig, 0, 0, n_total, n_total, cd_size, new_offset, 0)
+    return zipfile.ZipFile(io.BytesIO(data + cd + end))
 
 
 def main():
@@ -51,7 +81,7 @@ def main():
 
     tmp = omni + ".fe6tmp"
     changed = []
-    with zipfile.ZipFile(omni) as src, zipfile.ZipFile(tmp, "w") as dst:
+    with open_jar(omni) as src, zipfile.ZipFile(tmp, "w") as dst:
         for info in src.infolist():
             name = info.filename
             if name in replacements:
