@@ -1,0 +1,367 @@
+@import url("fe6-palette.css");
+@namespace xul url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+/* Fox Explorer 6 — Windows 98 controls for Firefox's other UI documents:
+ * sidebar pages (History / Favorites / Synced tabs), the Library window, the bookmark
+ * Add/Edit dialogs, the star "Edit bookmark" panel and other in-window dialogs.
+ *
+ * In those documents the rules apply everywhere. In the main browser window (also loaded
+ * there) they are limited to panels and dialog boxes so the IE6 toolbars aren't affected. */
+
+/* ---------------------------------------------------------------- Firefox design tokens
+   Most modern Firefox widgets (including ones inside shadow DOM) take their shapes and
+   colours from these variables, so overriding them squares and recolours everything. */
+:root {
+  --border-radius-xsmall: 0px !important;
+  --border-radius-small: 0px !important;
+  --border-radius-medium: 0px !important;
+  --border-radius-large: 0px !important;
+  --border-radius-xlarge: 0px !important;
+  --border-radius-circle: 0px !important;
+  --border-radius: 0px !important;
+  --button-border-radius: 0px !important;
+  --input-text-border-radius: 0px !important;
+  --input-search-border-radius: 0px !important;
+  --card-border-radius: 0px !important;
+  --card-border-radius-compact: 0px !important;
+  --panel-border-radius: 0px !important;
+  --panel-menuitem-border-radius: 0px !important;
+  --popup-border-radius: 0px !important;
+  --arrowpanel-border-radius: 0px !important;
+  --toolbarbutton-border-radius: 0px !important;
+
+  --background-color-canvas: var(--fe-face) !important;
+  --background-color-box: var(--fe-window) !important;
+  --background-color-list-item-hover: var(--fe-sel) !important;
+  --text-color: var(--fe-text) !important;
+  --text-color-deemphasized: var(--fe-graytext) !important;
+  --text-color-list-item-hover: var(--fe-seltext) !important;
+  --text-color-disabled: var(--fe-graytext) !important;
+  --border-color: var(--fe-shadow) !important;
+  --border-color-deemphasized: var(--fe-shadow) !important;
+  --border-color-interactive: var(--fe-shadow) !important;
+  --border-color-interactive-hover: var(--fe-shadow) !important;
+  --border-color-interactive-active: var(--fe-shadow) !important;
+  --border-color-selected: var(--fe-sel) !important;
+  --color-accent-primary: var(--fe-sel) !important;
+  --color-accent-primary-hover: var(--fe-sel) !important;
+  --color-accent-primary-active: var(--fe-sel) !important;
+  --color-accent-primary-selected: var(--fe-sel) !important;
+  --focus-outline-color: var(--fe-text) !important;
+  --focus-outline: 1px dotted var(--fe-text) !important;
+  --focus-outline-offset: -3px !important;
+
+  --input-text-background-color: var(--fe-window) !important;
+  --input-text-color: var(--fe-wintext) !important;
+  --input-text-border: 2px inset var(--fe-light) !important;   /* Gecko's "inset" ≈ Win98 sunken field */
+  --input-text-border-color: var(--fe-light) !important;
+  --input-border-color: var(--fe-light) !important;
+  --input-text-min-height: 21px !important;
+
+  --button-background-color: var(--fe-face) !important;
+  --button-background-color-hover: var(--fe-face) !important;
+  --button-background-color-active: var(--fe-face) !important;
+  --button-background-color-selected: var(--fe-face) !important;
+  --button-background-color-primary: var(--fe-face) !important;
+  --button-background-color-primary-hover: var(--fe-face) !important;
+  --button-background-color-primary-active: var(--fe-face) !important;
+  --button-background-color-ghost-hover: var(--fe-face) !important;
+  --button-background-color-ghost-active: var(--fe-face) !important;
+  --button-text-color: var(--fe-text) !important;
+  --button-text-color-hover: var(--fe-text) !important;
+  --button-text-color-active: var(--fe-text) !important;
+  --button-text-color-primary: var(--fe-text) !important;
+  --button-text-color-primary-hover: var(--fe-text) !important;
+  --button-text-color-primary-active: var(--fe-text) !important;
+  --button-border-color: var(--fe-shadow) !important;
+  --button-border-color-primary: var(--fe-dark) !important;
+  --button-border: 2px outset var(--fe-light) !important;      /* ≈ Win98 raised button */
+  --button-min-height: 23px !important;
+  --button-font-weight: normal !important;
+  --font-weight-bold: bold;
+
+  --in-content-page-background: var(--fe-face) !important;
+  --in-content-page-color: var(--fe-text) !important;
+  --in-content-box-background: var(--fe-window) !important;
+  --sidebar-background-color: var(--fe-face) !important;
+  --sidebar-text-color: var(--fe-text) !important;
+}
+
+/* ---------------------------------------------------------------- scope helper
+   :is(…) selectors below:
+     DOC   = any element in a non-browser document (sidebar page, Library, dialog)
+     PANEL = inside a panel / dialog box of the main browser window                  */
+
+:root:not([windowtype="navigator:browser"]),
+:root:not([windowtype="navigator:browser"]) body {
+  background-color: var(--fe-face) !important;
+  color: var(--fe-text) !important;
+  font: 11px "MS Sans Serif", "Microsoft Sans Serif", Tahoma, "Liberation Sans", Arial, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([windowtype="navigator:browser"]) { color-scheme: dark; }
+}
+
+/* text fields */
+:is(:root:not([windowtype="navigator:browser"]), #editBookmarkPanel, .dialogBox, #addon-webext-defaultsearch-notification, panel[type="arrow"])
+  :is(input:is([type="text"], [type="search"], [type="url"], [type="email"], [type="password"], [type="number"], :not([type])), textarea, search-textbox, .tabsFilter) {
+  appearance: none !important;
+  background: var(--fe-window) !important;
+  color: var(--fe-wintext) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  box-shadow: var(--fe-sunken) !important;
+  padding: 3px 4px !important;
+  min-height: 21px !important;
+  font: 11px "MS Sans Serif", "Microsoft Sans Serif", Tahoma, "Liberation Sans", Arial, sans-serif !important;
+}
+:is(:root:not([windowtype="navigator:browser"]), #editBookmarkPanel, .dialogBox, panel[type="arrow"])
+  :is(input, textarea, search-textbox)::selection { background: var(--fe-sel) !important; color: var(--fe-seltext) !important; }
+
+/* push buttons (XUL and HTML) */
+:is(:root:not([windowtype="navigator:browser"]), #editBookmarkPanel, .dialogBox, panel[type="arrow"])
+  :is(button:not(.close-icon, .ghost-button, [type="icon"], .tab-close-button, .toolbarbutton-1, .subviewbutton, .menu-button), xul|button, .footer-button, .panel-footer-button) {
+  appearance: none !important;
+  background: var(--fe-face) !important;
+  color: var(--fe-text) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: var(--fe-raised) !important;
+  padding: 2px 12px !important;
+  min-height: 23px !important;
+  min-width: 75px;
+  margin: 2px 4px;
+  font: 11px "MS Sans Serif", "Microsoft Sans Serif", Tahoma, "Liberation Sans", Arial, sans-serif !important;
+  text-shadow: none !important;
+}
+:is(:root:not([windowtype="navigator:browser"]), #editBookmarkPanel, .dialogBox, panel[type="arrow"])
+  :is(button, xul|button):not([disabled]):hover:active { box-shadow: var(--fe-pressed) !important; }
+:is(:root:not([windowtype="navigator:browser"]), #editBookmarkPanel, .dialogBox, panel[type="arrow"])
+  :is(button, xul|button):is([default], .primary, [dlgtype="accept"]) {
+  outline: 1px solid var(--fe-dark) !important; outline-offset: -1px !important;
+}
+:is(:root:not([windowtype="navigator:browser"]), #editBookmarkPanel, .dialogBox, panel[type="arrow"])
+  :is(button, xul|button)[disabled] { color: var(--fe-graytext) !important; text-shadow: 1px 1px var(--fe-hi) !important; }
+
+/* Firefox's newer moz-button component */
+moz-button::part(button), moz-button-group moz-button::part(button) {
+  border-radius: 0 !important;
+  box-shadow: var(--fe-raised) !important;
+  border: 0 !important;
+  background: var(--fe-face) !important;
+  color: var(--fe-text) !important;
+  font-weight: normal !important;
+}
+moz-button:not([disabled]):active::part(button) { box-shadow: var(--fe-pressed) !important; }
+moz-button[type~="primary"]::part(button) { outline: 1px solid var(--fe-dark) !important; outline-offset: -1px !important; }
+moz-button[type~="ghost"]::part(button), moz-button[type="icon ghost"]::part(button) { box-shadow: none !important; background: transparent !important; }
+moz-button[type~="ghost"]:hover::part(button) { box-shadow: var(--fe-thin-raised) !important; }
+
+/* drop-down lists (folder picker etc.) */
+:is(:root:not([windowtype="navigator:browser"]), #editBookmarkPanel, .dialogBox, panel[type="arrow"]) menulist {
+  appearance: none !important;
+  background: var(--fe-window) !important;
+  color: var(--fe-wintext) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: var(--fe-sunken) !important;
+  padding: 2px 2px 2px 4px !important;
+  min-height: 21px !important;
+}
+:is(:root:not([windowtype="navigator:browser"]), #editBookmarkPanel, .dialogBox, panel[type="arrow"]) menulist::part(dropmarker) {
+  appearance: none !important;
+  width: 16px; height: 16px;
+  background: var(--fe-face) conic-gradient(from -45deg at 50% 100%, var(--fe-text) 90deg, transparent 90deg) center / 8px 4px no-repeat !important;
+  box-shadow: var(--fe-raised) !important;
+}
+:is(:root:not([windowtype="navigator:browser"]), #editBookmarkPanel, .dialogBox, panel[type="arrow"]) :is(.expander-down, .expander-up, #editBMPanel_foldersExpander, #editBMPanel_tagsSelectorExpander) {
+  appearance: none !important;
+  border-radius: 0 !important;
+  background-color: var(--fe-face) !important;
+  box-shadow: var(--fe-raised) !important;
+  min-width: 21px !important;
+  -moz-context-properties: fill; fill: var(--fe-text) !important;
+}
+
+/* labels / groups */
+:root:not([windowtype="navigator:browser"]) :is(label, description, h1, h2, h3) { color: var(--fe-text); }
+:root:not([windowtype="navigator:browser"]) :is(h1, h2, h3, .header-name, .sidebar-panel-header) { font-weight: bold; }
+
+/* trees and lists (Library, classic sidebars, folder tree in the bookmark dialog) */
+:is(:root:not([windowtype="navigator:browser"]), #editBookmarkPanel, .dialogBox) tree,
+:root:not([windowtype="navigator:browser"]) :is(richlistbox, listbox) {
+  appearance: none !important;
+  background-color: var(--fe-window) !important;
+  color: var(--fe-wintext) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: var(--fe-sunken) !important;
+  padding: 2px !important;
+  margin: 0 !important;
+}
+:is(:root:not([windowtype="navigator:browser"]), #editBookmarkPanel) treecols { appearance: none !important; border: 0 !important; background: var(--fe-face) !important; }
+:is(:root:not([windowtype="navigator:browser"]), #editBookmarkPanel) treecol,
+:is(:root:not([windowtype="navigator:browser"]), #editBookmarkPanel) treecolpicker {
+  appearance: none !important;
+  background: var(--fe-face) !important;
+  color: var(--fe-text) !important;
+  border: 0 !important;
+  box-shadow: var(--fe-raised) !important;
+  padding: 2px 4px !important;
+}
+:is(:root:not([windowtype="navigator:browser"]), #editBookmarkPanel) treecol:hover:active { box-shadow: var(--fe-thin-sunken) !important; }
+treechildren::-moz-tree-row(selected) { background-color: var(--fe-graytext) !important; }
+treechildren::-moz-tree-row(selected, focus) { background-color: var(--fe-sel) !important; }
+treechildren::-moz-tree-cell-text(selected) { color: var(--fe-seltext) !important; }
+treechildren::-moz-tree-row(hover) { background-color: transparent !important; }
+treechildren::-moz-tree-row(selected, hover) { background-color: var(--fe-sel) !important; }
+treechildren::-moz-tree-cell-text { color: var(--fe-wintext); }
+treechildren::-moz-tree-row { border-radius: 0 !important; min-height: 18px !important; }
+:root:not([windowtype="navigator:browser"]) richlistitem[selected] { background: var(--fe-sel) !important; color: var(--fe-seltext) !important; }
+
+/* XUL toolbars inside the Library */
+:root:not([windowtype="navigator:browser"]) :is(toolbox, toolbar) {
+  appearance: none !important;
+  background: var(--fe-face) !important;
+  color: var(--fe-text) !important;
+  border: 0 !important;
+}
+:root:not([windowtype="navigator:browser"]) toolbar { box-shadow: inset 0 1px var(--fe-hi), inset 0 -1px var(--fe-shadow) !important; padding: 2px !important; }
+:root:not([windowtype="navigator:browser"]) toolbar :is(toolbarbutton, menu) {
+  appearance: none !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--fe-text) !important;
+  padding: 2px 6px !important;
+  margin: 1px !important;
+}
+:root:not([windowtype="navigator:browser"]) toolbar :is(toolbarbutton, menu):not([disabled]):hover { box-shadow: var(--fe-thin-raised) !important; }
+:root:not([windowtype="navigator:browser"]) toolbar :is(toolbarbutton, menu):is([open], :hover:active) { box-shadow: var(--fe-thin-sunken) !important; }
+:root:not([windowtype="navigator:browser"]) splitter { appearance: none !important; background: var(--fe-face) !important; border: 0 !important; min-width: 4px; min-height: 4px; }
+
+/* menus & context menus in these documents */
+:root:not([windowtype="navigator:browser"]) menupopup {
+  --panel-background: var(--fe-face) !important;
+  --panel-color: var(--fe-text) !important;
+  --panel-border-color: transparent !important;
+  --panel-padding: 2px !important;
+  --menu-background-color: var(--fe-face) !important;
+  --menu-color: var(--fe-text) !important;
+  --menuitem-hover-background-color: var(--fe-sel) !important;
+  appearance: none !important;
+}
+:root:not([windowtype="navigator:browser"]) menupopup::part(content) {
+  appearance: none !important; background: var(--fe-face) !important; border: 0 !important;
+  border-radius: 0 !important; box-shadow: var(--fe-raised) !important; padding: 3px !important;
+}
+:root:not([windowtype="navigator:browser"]) menupopup :is(menuitem, menu)[_moz-menuactive]:not([disabled]) {
+  background: var(--fe-sel) !important; color: var(--fe-seltext) !important;
+}
+
+/* cards & rows in the new sidebar pages (history, synced tabs) */
+:root:not([windowtype="navigator:browser"]) :is(moz-card, .card) { border-radius: 0 !important; box-shadow: none !important; }
+:root:not([windowtype="navigator:browser"]) :is(sidebar-tab-row, fxview-tab-row, .sidebar-tab-row)::part(row) { border-radius: 0 !important; }
+:root:not([windowtype="navigator:browser"]) a { color: var(--fe-link); }
+
+/* ---------------------------------------------------------------- in-window dialog box
+   (the window-modal box the Add/Edit bookmark dialog and others open in) */
+.dialogBox {
+  border-radius: 0 !important;
+  border: 0 !important;
+  background: var(--fe-face) !important;
+  box-shadow: var(--fe-raised), 2px 2px 0 rgba(0, 0, 0, .35) !important;
+  padding: 3px !important;
+}
+.dialogOverlay[topmost="true"] { background-color: rgba(0, 0, 0, .15) !important; }
+.dialogTitleBar {
+  background: linear-gradient(to right, var(--fe-cap1), var(--fe-cap2)) !important;
+  color: var(--fe-captext) !important;
+  border: 0 !important; border-radius: 0 !important;
+  padding: 2px 4px !important; margin: 0 0 2px !important;
+  font-weight: bold !important;
+}
+.dialogTitleBar .dialogClose {
+  appearance: none !important; border-radius: 0 !important;
+  background-color: var(--fe-face) !important; box-shadow: var(--fe-raised) !important;
+  -moz-context-properties: fill; fill: var(--fe-text) !important;
+}
+
+/* ---------------------------------------------------------------- Library / bookmark tree icons */
+treechildren::-moz-tree-image(title, container),
+treechildren::-moz-tree-image(title, open) { list-style-image: url("icons/folder.svg") !important; }
+treechildren::-moz-tree-image(container, queryFolder_toolbar_____),
+treechildren::-moz-tree-image(container, queryFolder_menu________) { list-style-image: url("icons/folder-favorites.svg") !important; }
+treechildren::-moz-tree-image(query) { list-style-image: url("icons/folder.svg") !important; }
+treechildren::-moz-tree-image(query, OrganizerQuery_allbms_____v) { list-style-image: url("icons/favorites.svg") !important; }
+treechildren::-moz-tree-image(query, OrganizerQuery_downloads__v) { list-style-image: url("icons/downloads.svg") !important; }
+treechildren::-moz-tree-image(title, query, tagContainer),
+treechildren::-moz-tree-image(query, OrganizerQuery_tags_______v) { list-style-image: url("icons/tag.svg") !important; }
+treechildren::-moz-tree-image(title, query, dayContainer) { list-style-image: url("icons/day.svg") !important; }
+treechildren::-moz-tree-image(title, query, hostContainer) { list-style-image: url("icons/folder.svg") !important; }
+treechildren::-moz-tree-image(query, OrganizerQuery_history____v) { list-style-image: url("icons/history.svg") !important; }
+treechildren::-moz-tree-image(title, query, folder) { list-style-image: url("icons/folder.svg") !important; }
+treechildren::-moz-tree-image(title) { -moz-context-properties: none !important; }
+treechildren::-moz-tree-image { width: 16px !important; height: 16px !important; }
+treechildren::-moz-tree-twisty { -moz-context-properties: fill; fill: var(--fe-wintext) !important; }
+
+/* Library details pane and the search box in its toolbar */
+:root:not([windowtype="navigator:browser"]) :is(#detailsPane, #infoBox, #itemsCountBox, .editBMPanel_rowLabel) {
+  background-color: var(--fe-face) !important;
+  color: var(--fe-text) !important;
+}
+:root:not([windowtype="navigator:browser"]) #detailsPane { border-top: 1px solid var(--fe-hi) !important; box-shadow: inset 0 1px var(--fe-shadow) !important; }
+
+:root:not([windowtype="navigator:browser"]) #back-button { list-style-image: url("icons/back.svg") !important; }
+:root:not([windowtype="navigator:browser"]) #forward-button { list-style-image: url("icons/forward.svg") !important; }
+:root:not([windowtype="navigator:browser"]) :is(#back-button, #forward-button) .toolbarbutton-icon { -moz-context-properties: none !important; width: 20px !important; height: 20px !important; }
+:root:not([windowtype="navigator:browser"]) :is(#back-button, #forward-button)[disabled] .toolbarbutton-icon { filter: grayscale(1) opacity(.45); }
+
+/* Firefox's input components (search box in the sidebar, etc.) redefine their tokens on
+   :host, so set them on the components themselves */
+:is(moz-input-search, moz-input-text, moz-input-folder, moz-input-number, moz-select, moz-input-password, fxview-search-textbox) {
+  --focus-outline: 1px dotted var(--fe-wintext) !important;
+  --focus-outline-color: var(--fe-wintext) !important;
+  --focus-outline-width: 1px !important;
+  --focus-outline-offset: -4px !important;
+  --input-text-border: 2px inset var(--fe-light) !important;
+  --input-text-border-color: var(--fe-light) !important;
+  --input-text-border-radius: 0px !important;
+  --input-search-border-radius: 0px !important;
+  --input-text-background-color: var(--fe-window) !important;
+  --input-text-color: var(--fe-wintext) !important;
+  --border-radius-small: 0px !important;
+  --border-radius-medium: 0px !important;
+  --border-radius-circle: 0px !important;
+  --color-accent-primary: var(--fe-wintext) !important;
+}
+:is(moz-button, moz-button-group, panel-list, panel-item, moz-toggle, moz-card, moz-box-item, moz-box-button) {
+  --button-border-radius: 0px !important;
+  --border-radius-small: 0px !important;
+  --border-radius-medium: 0px !important;
+  --border-radius-large: 0px !important;
+  --border-radius-circle: 0px !important;
+  --focus-outline: 1px dotted var(--fe-text) !important;
+  --focus-outline-offset: -4px !important;
+}
+
+/* HTML drop-downs (print dialog etc.): Win98 combo box */
+:root:not([windowtype="navigator:browser"]) select {
+  appearance: none !important;
+  background: var(--fe-window) !important;
+  color: var(--fe-wintext) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: var(--fe-sunken) !important;
+  padding: 3px 22px 3px 4px !important;
+  min-height: 21px !important;
+  font: 11px "MS Sans Serif", "Microsoft Sans Serif", Tahoma, "Liberation Sans", Arial, sans-serif !important;
+  background-image:
+    conic-gradient(from -45deg at 50% 100%, var(--fe-text) 90deg, transparent 90deg),
+    linear-gradient(var(--fe-face), var(--fe-face)) !important;
+  background-size: 8px 4px, 16px calc(100% - 4px) !important;
+  background-position: right 6px center, right 2px center !important;
+  background-repeat: no-repeat !important;
+}
+:root:not([windowtype="navigator:browser"]) select:focus-visible { outline: 1px dotted var(--fe-wintext) !important; outline-offset: -4px !important; }

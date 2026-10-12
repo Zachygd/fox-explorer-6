@@ -20,6 +20,7 @@ while [ $# -gt 0 ]; do
     --rpm) RPM=1; shift;;
     --jobs) JOBS="$2"; shift 2;;
     --ie6-icons) IE6_MEDIA="$2"; shift 2;;
+    --no-ie6-icons) IE6_MEDIA="none"; shift;;
     -h|--help) sed -n 2,13p "$0"; exit 0;;
     *) echo "unknown option: $1" >&2; exit 2;;
   esac
@@ -66,7 +67,9 @@ tar -C "$WORK" -xf "$PKG"
 APP="$WORK/foxexplorer6"
 echo "==> installing the IE6 chrome layer"
 "$HERE/scripts/apply-layer.sh" "$APP"
+IE6_MEDIA="$("$HERE/scripts/find-ie6-media.sh" "$IE6_MEDIA")"
 if [ -n "$IE6_MEDIA" ]; then
+  echo "==> importing IE6 icons from $IE6_MEDIA"
   python3 "$HERE/scripts/import-ie6-icons.py" "$IE6_MEDIA" "$APP/foxexplorer/ie6"
 fi
 TARBALL_OUT="$("$HERE/scripts/package.sh" "$APP" "$VERSION" "$ARCH" "$HERE/dist")"

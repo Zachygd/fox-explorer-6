@@ -96,3 +96,72 @@ svg("menu-check.svg", 16, f'<path d="M4,7 L6,9 L11,4 V6 L6,11 L4,9 Z" {cf}/>')
 svg("menu-radio.svg", 16, f'<rect x="6" y="6" width="4" height="4" {cf}/><rect x="5" y="7" width="6" height="2" {cf}/><rect x="7" y="5" width="2" height="6" {cf}/>')
 # "List all tabs": a Win98 combo-box drop arrow
 svg("alltabs.svg", 16, f'<path d="M4,6 H12 L8,10 Z" {cf}/>')
+
+# ---------------------------------------------------------------- palette / sidebar icons (20x20)
+GP = ' shape-rendering="geometricPrecision"'
+page = lambda x=3.5, y=1.5, w=12, h=17: (f'<path d="M{x},{y} H{x+w-4} L{x+w},{y+4} V{y+h} H{x} Z" fill="{W}" stroke="{K}"/>'
+                                         f'<path d="M{x+w-4},{y} V{y+4} H{x+w}" fill="{S}" stroke="{K}"/>')
+svg("save.svg", 20, f'<rect x="2.5" y="2.5" width="15" height="15" fill="{N}" stroke="{K}"/><rect x="5.5" y="2.5" width="9" height="6" fill="{W}" stroke="{K}"/>'
+    f'<rect x="11" y="3.5" width="2" height="4" fill="{N}"/><rect x="4.5" y="11.5" width="11" height="6" fill="{S}" stroke="{K}"/><path d="M6,13.5 H14 M6,15.5 H12" stroke="{G}"/>')
+svg("find.svg", 20, page(2.5, 1.5, 11, 16) + f'<path d="M4.5,6.5 H10.5 M4.5,8.5 H8.5" stroke="{G}"/>'
+    f'<circle cx="12" cy="11" r="4" fill="#bfe8ff" stroke="{K}" stroke-width="1.6"{GP}/><path d="M15,14 L18.5,17.5" stroke="{K}" stroke-width="3" stroke-linecap="round"{GP}/>')
+svg("open.svg", 20, f'<path d="M1.5,5.5 H6.5 L8.5,7.5 H15.5 V16.5 H1.5 Z" fill="{Y}" stroke="{O}"/>'
+    f'<path d="M3.5,10.5 H18.5 L15.5,16.5 H1.5 Z" fill="#ffe680" stroke="{O}"/><path d="M12,2 Q16,1 17,5" fill="none" stroke="{B}" stroke-width="1.5"{GP}/><polygon points="17.5,6.5 15.5,4 19,3.5" fill="{B}"{GP}/>')
+svg("cut.svg", 20, f'<path d="M7,2 L11,11 M13,2 L9,11" stroke="{G}" stroke-width="2"{GP}/>'
+    f'<circle cx="6.5" cy="14.5" r="3" fill="none" stroke="{B}" stroke-width="1.8"{GP}/><circle cx="13.5" cy="14.5" r="3" fill="none" stroke="{B}" stroke-width="1.8"{GP}/>')
+svg("copy.svg", 20, page(1.5, 1.5, 10, 12) + page(7.5, 6.5, 10, 12) + f'<path d="M9.5,11.5 H15.5 M9.5,13.5 H15.5 M9.5,15.5 H13.5" stroke="{B}"/>')
+svg("paste.svg", 20, f'<rect x="2.5" y="3.5" width="12" height="15" fill="#b08040" stroke="{K}"/><rect x="5.5" y="1.5" width="6" height="4" fill="{S}" stroke="{K}"/>'
+    + page(8.5, 7.5, 9, 11) + f'<path d="M10.5,11.5 H15.5 M10.5,13.5 H15.5 M10.5,15.5 H14.5" stroke="{B}"/>')
+svg("zoom-in.svg", 20, f'<circle cx="8.5" cy="8.5" r="6" fill="#bfe8ff" stroke="{K}" stroke-width="1.6"{GP}/><path d="M13,13 L18.5,18.5" stroke="{K}" stroke-width="3" stroke-linecap="round"{GP}/>'
+    f'<path d="M5.5,8.5 H11.5 M8.5,5.5 V11.5" stroke="{K}" stroke-width="1.6"/>')
+svg("zoom-out.svg", 20, f'<circle cx="8.5" cy="8.5" r="6" fill="#bfe8ff" stroke="{K}" stroke-width="1.6"{GP}/><path d="M13,13 L18.5,18.5" stroke="{K}" stroke-width="3" stroke-linecap="round"{GP}/>'
+    f'<path d="M5.5,8.5 H11.5" stroke="{K}" stroke-width="1.6"/>')
+svg("encoding.svg", 20, f'<text x="1" y="12" font-family="Times New Roman, serif" font-size="12" font-weight="bold" fill="{B}">A</text>'
+    f'<text x="9" y="17" font-family="Times New Roman, serif" font-size="11" font-weight="bold" fill="{GR}">a</text><path d="M3,17.5 H8 M15,3 V8" stroke="{R}" stroke-width="1.5"/>')
+svg("key.svg", 20, f'<circle cx="6" cy="10" r="4" fill="{Y}" stroke="{O}" stroke-width="1.4"{GP}/><circle cx="6" cy="10" r="1.3" fill="{W}"{GP}/>'
+    f'<rect x="9.5" y="9" width="9" height="2" fill="{Y}" stroke="{O}"/><rect x="14.5" y="11" width="2" height="3" fill="{Y}" stroke="{O}"/><rect x="17" y="11" width="1.5" height="2" fill="{O}"/>')
+svg("share.svg", 20, page(2.5, 4.5, 11, 14) + f'<path d="M8,11 Q10,4 16,4" fill="none" stroke="{GR}" stroke-width="2"{GP}/><polygon points="15,1 19.5,4 15,7" fill="{GR}"{GP}/>')
+svg("synced.svg", 20, f'<rect x="1.5" y="3.5" width="11" height="8" fill="{T}" stroke="{K}"/><rect x="5.5" y="11.5" width="3" height="2" fill="{S}" stroke="{K}"/>'
+    f'<rect x="12.5" y="8.5" width="6" height="10" fill="{S}" stroke="{K}"/><rect x="13.5" y="9.5" width="4" height="7" fill="{T}"/>'
+    f'<path d="M4,16 Q6,18.5 10,17" fill="none" stroke="{GR}" stroke-width="1.6"{GP}/>')
+svg("sendtab.svg", 20, page(1.5, 2.5, 9, 12) + f'<rect x="12.5" y="6.5" width="6" height="11" fill="{S}" stroke="{K}"/><rect x="13.5" y="7.5" width="4" height="8" fill="{T}"/>'
+    f'<path d="M5,9.5 H11" stroke="{GR}" stroke-width="2"/><polygon points="10,6.5 13,9.5 10,12.5" fill="{GR}"/>')
+svg("settings.svg", 20, f'<rect x="2.5" y="2.5" width="15" height="15" fill="{W}" stroke="{K}"/><rect x="2.5" y="2.5" width="15" height="3" fill="{N}" stroke="{K}"/>'
+    f'<rect x="4.5" y="8.5" width="3" height="3" fill="{W}" stroke="{K}"/><path d="M5,10 L6,11 L8,8" stroke="{GR}" stroke-width="1.2" fill="none"{GP}/><path d="M9.5,10.5 H15.5 M9.5,14.5 H15.5" stroke="{G}"/>'
+    f'<rect x="4.5" y="12.5" width="3" height="3" fill="{W}" stroke="{K}"/>')
+svg("forget.svg", 20, page(3.5, 1.5, 12, 17) + f'<path d="M6,6 L13,15 M13,6 L6,15" stroke="{R}" stroke-width="2.4"{GP}/>')
+svg("private.svg", 20, f'<rect x="1.5" y="3.5" width="17" height="13" fill="{W}" stroke="{K}"/><rect x="1.5" y="3.5" width="17" height="3" fill="#600080" stroke="{K}"/>'
+    f'<path d="M4,11 Q7,9 10,11 Q13,9 16,11 L15,14 Q12.5,15 11,13 L9,13 Q7.5,15 5,14 Z" fill="{K}"{GP}/>')
+svg("fxview.svg", 20, f'<rect x="1.5" y="4.5" width="17" height="13" fill="{W}" stroke="{K}"/><rect x="2.5" y="2.5" width="5" height="3" fill="{S}" stroke="{K}"/><rect x="8.5" y="2.5" width="5" height="3" fill="{S}" stroke="{K}"/>'
+    f'<path d="M4.5,8.5 H15.5 M4.5,11.5 H15.5 M4.5,14.5 H11.5" stroke="{B}"/>')
+svg("developer.svg", 20, f'<rect x="2" y="3" width="9" height="5" fill="{G}" stroke="{K}" transform="rotate(-35 6.5 5.5)"/>'
+    f'<rect x="7.5" y="6.5" width="3" height="12" fill="{M}" stroke="{K}" transform="rotate(-35 9 12.5)"/>'
+    f'<path d="M12,4 L17,4 L17,6 L14,6 L14,17 L12,17 Z" fill="{S}" stroke="{K}"/>')
+svg("screenshot.svg", 20, f'<rect x="1.5" y="5.5" width="17" height="11" fill="{G}" stroke="{K}"/><rect x="6.5" y="3.5" width="6" height="2" fill="{G}" stroke="{K}"/>'
+    f'<circle cx="10" cy="11" r="3.5" fill="#bfe8ff" stroke="{K}" stroke-width="1.3"{GP}/><rect x="14.5" y="6.5" width="2" height="1.5" fill="{Y}"/>')
+svg("import.svg", 20, f'<path d="M1.5,7.5 H6.5 L8.5,9.5 H18.5 V18.5 H1.5 Z" fill="{Y}" stroke="{O}"/><rect x="2.5" y="10.5" width="15" height="1" fill="{W}"/>'
+    f'<path d="M10,1.5 V9" stroke="{GR}" stroke-width="2.2"/><polygon points="6.5,7 10,11 13.5,7" fill="{GR}"/>')
+svg("newwindow.svg", 20, f'<rect x="1.5" y="4.5" width="14" height="12" fill="{W}" stroke="{K}"/><rect x="1.5" y="4.5" width="14" height="3" fill="{N}" stroke="{K}"/>'
+    f'<path d="M15.5,1 L16.5,3.5 L19,4.5 L16.5,5.5 L15.5,8 L14.5,5.5 L12,4.5 L14.5,3.5 Z" fill="{Y}" stroke="{O}" stroke-width=".8"{GP}/>')
+svg("fullscreen.svg", 20, f'<rect x="1.5" y="2.5" width="17" height="15" fill="{W}" stroke="{K}"/><rect x="1.5" y="2.5" width="17" height="3" fill="{N}" stroke="{K}"/>'
+    f'<path d="M5,9 V7.5 H7 M15,9 V7.5 H13 M5,13 V15 H7 M15,13 V15 H13" fill="none" stroke="{R}" stroke-width="1.4"/>')
+svg("library.svg", 20, f'<rect x="1.5" y="3.5" width="4" height="14" fill="{R}" stroke="{K}"/><rect x="5.5" y="5.5" width="4" height="12" fill="{B}" stroke="{K}"/>'
+    f'<rect x="9.5" y="2.5" width="4" height="15" fill="{GR}" stroke="{K}"/><rect x="13.5" y="5.5" width="4" height="12" fill="{Y}" stroke="{O}" transform="rotate(12 15.5 17)"/>'
+    f'<path d="M2.5,6.5 H4.5 M6.5,8.5 H8.5 M10.5,5.5 H12.5" stroke="{W}"/>')
+svg("account.svg", 20, f'<circle cx="10" cy="7" r="4" fill="#ffd8b0" stroke="{K}"{GP}/><path d="M3,18.5 Q3,11.5 10,11.5 Q17,11.5 17,18.5 Z" fill="{B}" stroke="{K}"{GP}/>'
+    f'<path d="M6.5,6 Q10,1.5 13.5,6" fill="{M}" stroke="{K}" stroke-width=".8"{GP}/>')
+svg("tabgroups.svg", 20, f'<rect x="1.5" y="6.5" width="17" height="11" fill="{W}" stroke="{K}"/><rect x="1.5" y="3.5" width="5" height="3" fill="{R}" stroke="{K}"/>'
+    f'<rect x="6.5" y="3.5" width="5" height="3" fill="{GR}" stroke="{K}"/><rect x="11.5" y="3.5" width="5" height="3" fill="{B}" stroke="{K}"/>')
+svg("splitview.svg", 20, f'<rect x="1.5" y="3.5" width="17" height="14" fill="{W}" stroke="{K}"/><rect x="1.5" y="3.5" width="17" height="3" fill="{N}" stroke="{K}"/><path d="M10,6.5 V17" stroke="{K}"/>')
+svg("pip.svg", 20, f'<rect x="1.5" y="3.5" width="17" height="14" fill="{W}" stroke="{K}"/><rect x="9.5" y="10.5" width="7" height="5" fill="{T}" stroke="{K}"/>')
+svg("chat.svg", 20, f'<path d="M2.5,3.5 H17.5 V13.5 H8 L4,17 V13.5 H2.5 Z" fill="#ffffe1" stroke="{K}"/><path d="M5,7 H15 M5,10 H12" stroke="{G}"/>')
+svg("reader.svg", 20, page(3.5, 1.5, 13, 17) + f'<path d="M5.5,6.5 H13.5 M5.5,9 H13.5 M5.5,11.5 H13.5 M5.5,14 H11" stroke="{K}"/>')
+svg("monitor.svg", 20, f'<path d="M2,15 A8,8 0 0 1 18,15 Z" fill="{W}" stroke="{K}"{GP}/><path d="M10,15 L14,8" stroke="{R}" stroke-width="1.8"{GP}/>'
+    f'<circle cx="10" cy="15" r="1.5" fill="{K}"{GP}/><path d="M3.5,15 H5 M15,15 H16.5 M10,8 V9.5" stroke="{K}"/>')
+svg("customize.svg", 20, f'<path d="M1.5,5.5 H6.5 L8.5,7.5 H15.5 V16.5 H1.5 Z" fill="{Y}" stroke="{O}"/>'
+    f'<rect x="12" y="1" width="6" height="4" fill="{G}" stroke="{K}"/><rect x="14" y="5" width="2" height="12" fill="{M}" stroke="{K}"/>')
+# Links-bar chevron (») and a plain drop arrow for the Search drop-down
+svg("chevron.svg", 16, f'<path d="M4,4 L7,8 L4,12 M8,4 L11,8 L8,12" fill="none" {cf.replace("fill","stroke")} stroke-width="1.6"/>')
+svg("tag.svg", 16, f'<path d="M1.5,2.5 H8.5 L14.5,8.5 L8.5,14.5 L1.5,7.5 Z" fill="{Y}" stroke="{O}"{GP}/><circle cx="4.5" cy="5.5" r="1.2" fill="{W}" stroke="{O}" stroke-width=".8"{GP}/>')
+svg("day.svg", 16, f'<rect x="1.5" y="2.5" width="13" height="12" fill="{W}" stroke="{K}"/><rect x="1.5" y="2.5" width="13" height="3" fill="{R}" stroke="{K}"/><path d="M4,8.5 H6 M7,8.5 H9 M10,8.5 H12 M4,11.5 H6 M7,11.5 H9" stroke="{K}"/>')
+svg("folder-favorites.svg", 16, f'<path d="M0.5,3.5 H5.5 L7.5,5.5 H14.5 V13.5 H0.5 Z" fill="{Y}" stroke="{O}"/><polygon points="8,6.5 9,8.8 11.4,9 9.6,10.5 10.2,12.8 8,11.5 5.8,12.8 6.4,10.5 4.6,9 7,8.8" fill="{W}" stroke="{O}" stroke-width=".7"{GP}/>')

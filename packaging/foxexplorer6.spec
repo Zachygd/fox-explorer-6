@@ -13,7 +13,7 @@
 
 Name:           foxexplorer6
 Version:        %{fe_version}
-Release:        1%{?dist}
+Release:        %{?fe_release}%{!?fe_release:1}%{?dist}
 Summary:        Firefox with the classic Internet Explorer 6 / Windows 98 look
 License:        MPL-2.0
 URL:            https://github.com/mozilla-firefox/firefox
@@ -46,6 +46,16 @@ install -D -m 0644 foxexplorer/foxexplorer6.metainfo.xml %{buildroot}%{_metainfo
 for s in 16 22 24 32 48 64 128 256; do
   install -D -m 0644 foxexplorer/appicons/foxexplorer6-$s.png %{buildroot}%{_datadir}/icons/hicolor/${s}x${s}/apps/foxexplorer6.png
 done
+install -D -m 0644 foxexplorer/appicons/foxexplorer6.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/foxexplorer6.svg
+
+%post
+touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
+gtk-update-icon-cache -q %{_datadir}/icons/hicolor &>/dev/null || :
+update-desktop-database -q %{_datadir}/applications &>/dev/null || :
+
+%postun
+touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
+gtk-update-icon-cache -q %{_datadir}/icons/hicolor &>/dev/null || :
 
 %files
 %license foxexplorer/LICENSE
@@ -56,5 +66,5 @@ done
 %{_datadir}/icons/hicolor/*/apps/foxexplorer6.*
 
 %changelog
-* Mon Oct 12 2026 Fox Explorer 6 build <noreply@example.invalid> - %{fe_version}-1
+* Mon Oct 12 2026 Fox Explorer 6 build <noreply@example.invalid> - %{fe_version}
 - Package Fox Explorer 6

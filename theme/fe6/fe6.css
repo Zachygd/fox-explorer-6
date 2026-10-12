@@ -1,71 +1,10 @@
+@import url("fe6-palette.css");
 /* Fox Explorer 6 — Internet Explorer 6 / Windows 98 look for the Firefox UI.
  * Loaded as an author sheet into every browser window by fe6-boot.sys.mjs.
  * Light = classic Windows 98 "Windows Standard" scheme.
  * Dark  = the same scheme with every colour's lightness flipped (bevel lighting kept top-left). */
 
-/* ===================================================================== palette */
 :root {
-  --fe-face: #c0c0c0;
-  --fe-light: #dfdfdf;      /* outer top-left of raised controls */
-  --fe-hi: #ffffff;         /* inner top-left highlight */
-  --fe-shadow: #808080;     /* inner bottom-right shadow */
-  --fe-dark: #000000;       /* outer bottom-right shadow */
-  --fe-text: #000000;
-  --fe-graytext: #808080;
-  --fe-window: #ffffff;
-  --fe-wintext: #000000;
-  --fe-sel: #000080;
-  --fe-seltext: #ffffff;
-  --fe-cap1: #000080;
-  --fe-cap2: #1084d0;
-  --fe-capi1: #808080;
-  --fe-capi2: #b5b5b5;
-  --fe-captext: #ffffff;
-  --fe-capitext: #c0c0c0;
-  --fe-tip: #ffffe1;
-  --fe-tiptext: #000000;
-  --fe-link: #0000ff;
-  --fe-progress: #000080;
-  --fe-icon-filter: none;
-  --fe-cold-filter: grayscale(1);
-  --fe-disabled-filter: grayscale(1) opacity(.45);
-  --fe-font: 11px "MS Sans Serif", "Microsoft Sans Serif", "Tahoma", "Liberation Sans", "Arial", sans-serif;
-  --fe-font-bold: bold 11px "MS Sans Serif", "Microsoft Sans Serif", "Tahoma", "Liberation Sans", "Arial", sans-serif;
-}
-:root[fe6-scheme="dark"] {
-  --fe-face: #3f3f3f;
-  --fe-light: #4c4c4c;
-  --fe-hi: #6e6e6e;
-  --fe-shadow: #1f1f1f;
-  --fe-dark: #000000;
-  --fe-text: #ffffff;
-  --fe-graytext: #8f8f8f;
-  --fe-window: #000000;
-  --fe-wintext: #ffffff;
-  --fe-sel: #2a4fbf;
-  --fe-seltext: #ffffff;
-  --fe-cap1: #0b1a5c;
-  --fe-cap2: #1f5f99;
-  --fe-capi1: #2f2f2f;
-  --fe-capi2: #4a4a4a;
-  --fe-captext: #ffffff;
-  --fe-capitext: #9a9a9a;
-  --fe-tip: #1e1e00;
-  --fe-tiptext: #ffffff;
-  --fe-link: #8fb4ff;
-  --fe-progress: #3a6ad8;
-  --fe-cold-filter: grayscale(1) brightness(1.6);
-  --fe-disabled-filter: grayscale(1) brightness(1.2) opacity(.35);
-}
-:root {
-  /* reusable bevels (Win98 draws them with two 1px lines on each side) */
-  --fe-raised: inset -1px -1px var(--fe-dark), inset 1px 1px var(--fe-hi), inset -2px -2px var(--fe-shadow), inset 2px 2px var(--fe-light);
-  --fe-pressed: inset -1px -1px var(--fe-hi), inset 1px 1px var(--fe-dark), inset -2px -2px var(--fe-light), inset 2px 2px var(--fe-shadow);
-  --fe-sunken: inset -1px -1px var(--fe-hi), inset 1px 1px var(--fe-shadow), inset -2px -2px var(--fe-light), inset 2px 2px var(--fe-dark);
-  --fe-thin-raised: inset -1px -1px var(--fe-shadow), inset 1px 1px var(--fe-hi);
-  --fe-thin-sunken: inset -1px -1px var(--fe-hi), inset 1px 1px var(--fe-shadow);
-  --fe-gripper: linear-gradient(to right, var(--fe-hi) 0 1px, var(--fe-face) 1px 2px, var(--fe-shadow) 2px 3px);
-
   /* hand the palette to Firefox's own variables so panels, popups, sidebars and
      extension popups pick it up too */
   --toolbar-bgcolor: var(--fe-face) !important;
@@ -586,7 +525,7 @@ panel-item:is(:hover, :focus-visible, [_moz-menuactive])::part(button) {
   color: var(--fe-text);
 }
 #PersonalToolbar toolbarbutton.bookmark-item { padding: 1px 4px !important; max-width: 16em !important; }
-#PersonalToolbar toolbarbutton.bookmark-item:not([container]) { list-style-image: url("icons/page.svg"); }
+#PersonalToolbar toolbarbutton.bookmark-item:not([container]):not([image]) { list-style-image: url("icons/page-logo.png"); }
 #PersonalToolbar toolbarbutton.bookmark-item[container] { list-style-image: url("icons/folder.svg") !important; }
 #PersonalToolbar .bookmark-item > .toolbarbutton-icon { width: 16px !important; height: 16px !important; margin-inline-end: 3px !important; }
 #PersonalToolbar .bookmark-item > .toolbarbutton-text { color: var(--fe-text) !important; }
@@ -634,7 +573,7 @@ panel-item:is(:hover, :focus-visible, [_moz-menuactive])::part(button) {
 .tab-label-container { height: auto !important; }
 .tab-secondary-label { font-size: 9px !important; color: var(--fe-graytext) !important; }
 .tab-icon-image, .tab-icon-pending, .tab-throbber, .tab-sharing-icon-overlay, .tab-icon-stack { margin-inline-end: 4px !important; }
-.tabbrowser-tab:not([image]) .tab-icon-image { list-style-image: url("icons/page.svg") !important; }
+.tabbrowser-tab:not([image]) .tab-icon-image { list-style-image: url("icons/page-logo.png") !important; }
 .tab-close-button {
   appearance: none !important;
   width: 16px !important; height: 14px !important;
@@ -707,7 +646,7 @@ panel-item:is(:hover, :focus-visible, [_moz-menuactive])::part(button) {
 .fe6-pane > image { width: 16px; height: 16px; flex: none; margin-inline-end: 4px; }
 #fe6-status-main { flex: 1; }
 #fe6-status-text { flex: 1; }
-#fe6-status-icon { list-style-image: url("icons/page.svg"); }
+#fe6-status-icon { list-style-image: url("icons/page-logo.png"); }
 #fe6-status-progress { width: 120px; padding: 3px 3px; }
 #fe6-status-meter {
   height: 100%; width: 0%;
@@ -866,3 +805,130 @@ menupopup menuitem[type="checkbox"][checked="true"] > .menu-iconic-left > .menu-
 menupopup menuitem[type="checkbox"][checked="true"] > .menu-check { list-style-image: url("icons/menu-check.svg") !important; }
 menupopup menuitem[type="radio"][checked="true"] > .menu-iconic-left > .menu-iconic-icon,
 menupopup menuitem[type="radio"][checked="true"] > .menu-check { list-style-image: url("icons/menu-radio.svg") !important; }
+
+
+/* ===================================================================== Search drop-down
+   The toolbar's Search button lists the search engines (it replaces the picker that used
+   to sit inside the Address bar). */
+#urlbar :is(#urlbar-searchmode-switcher, .searchmode-switcher) { display: none !important; }
+#fe6-search-button > .toolbarbutton-menu-dropmarker,
+#fe6-search-button > dropmarker { display: none !important; }
+#fe6-search-popup menuitem .menu-iconic-icon { width: 16px !important; height: 16px !important; }
+
+/* ===================================================================== Links bar » button */
+#PlacesChevron {
+  appearance: none !important;
+  list-style-image: url("icons/chevron.svg") !important;
+  -moz-context-properties: fill, stroke !important;
+  fill: var(--fe-text) !important;
+  stroke: var(--fe-text) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 1px 3px !important;
+  margin: 0 !important;
+}
+#PlacesChevron > .toolbarbutton-icon {
+  width: 16px !important; height: 16px !important; padding: 0 !important;
+  background: transparent !important; box-shadow: none !important; border-radius: 0 !important;
+}
+#PlacesChevron:hover { box-shadow: var(--fe-thin-raised) !important; }
+#PlacesChevron:is([open], :hover:active) { box-shadow: var(--fe-thin-sunken) !important; }
+
+/* ===================================================================== icons for every
+   Customize-palette item (cold/grey until hovered, like the IE6 buttons) */
+#history-panelmenu { list-style-image: url("icons/history.svg") !important; }
+#save-page-button { list-style-image: url("icons/save.svg") !important; }
+#find-button { list-style-image: url("icons/find.svg") !important; }
+#open-file-button { list-style-image: url("icons/open.svg") !important; }
+#zoom-in-button { list-style-image: url("icons/zoom-in.svg") !important; }
+#zoom-out-button { list-style-image: url("icons/zoom-out.svg") !important; }
+#cut-button { list-style-image: url("icons/cut.svg") !important; }
+#copy-button { list-style-image: url("icons/copy.svg") !important; }
+#paste-button { list-style-image: url("icons/paste.svg") !important; }
+#characterencoding-button { list-style-image: url("icons/encoding.svg") !important; }
+#email-link-button { list-style-image: url("icons/mail.svg") !important; }
+#logins-button { list-style-image: url("icons/key.svg") !important; }
+#share-tab-button, #share-button { list-style-image: url("icons/share.svg") !important; }
+#sync-button { list-style-image: url("icons/synced.svg") !important; }
+#send-tab-button { list-style-image: url("icons/sendtab.svg") !important; }
+#preferences-button { list-style-image: url("icons/settings.svg") !important; }
+#panic-button { list-style-image: url("icons/forget.svg") !important; }
+#privatebrowsing-button { list-style-image: url("icons/private.svg") !important; }
+#firefox-view-button { list-style-image: url("icons/fxview.svg") !important; }
+#developer-button { list-style-image: url("icons/developer.svg") !important; }
+#screenshot-button { list-style-image: url("icons/screenshot.svg") !important; }
+#import-button { list-style-image: url("icons/import.svg") !important; }
+#new-window-button { list-style-image: url("icons/newwindow.svg") !important; }
+#fullscreen-button { list-style-image: url("icons/fullscreen.svg") !important; }
+#bookmarks-menu-button, #bookmarks-toolbar-button { list-style-image: url("icons/favorites.svg") !important; }
+#library-button { list-style-image: url("icons/library.svg") !important; }
+#fxa-toolbar-menu-button { list-style-image: url("icons/account.svg") !important; }
+#reload-button { list-style-image: url("icons/refresh.svg") !important; }
+#stop-button { list-style-image: url("icons/stop.svg") !important; }
+#tab-groups-button { list-style-image: url("icons/tabgroups.svg") !important; }
+#split-view-button { list-style-image: url("icons/splitview.svg") !important; }
+#picture-in-picture-button { list-style-image: url("icons/pip.svg") !important; }
+#new-tab-button { list-style-image: url("icons/newtab.svg") !important; }
+:is(#history-panelmenu, #save-page-button, #find-button, #open-file-button, #zoom-in-button, #zoom-out-button,
+    #cut-button, #copy-button, #paste-button, #characterencoding-button, #email-link-button, #logins-button,
+    #share-tab-button, #share-button, #sync-button, #send-tab-button, #preferences-button, #panic-button,
+    #privatebrowsing-button, #firefox-view-button, #developer-button, #screenshot-button, #import-button,
+    #new-window-button, #fullscreen-button, #bookmarks-menu-button, #bookmarks-toolbar-button, #library-button,
+    #fxa-toolbar-menu-button, #reload-button, #stop-button, #tab-groups-button, #split-view-button,
+    #picture-in-picture-button, #new-tab-button, #downloads-button, #unified-extensions-button, #sidebar-button,
+    #home-button, #alltabs-button)
+  :is(.toolbarbutton-icon, .toolbarbutton-badge-stack > .toolbarbutton-icon) {
+  -moz-context-properties: none !important;
+  fill: none !important;
+}
+#fxa-toolbar-menu-button .toolbarbutton-icon { border-radius: 0 !important; }
+#zoom-reset-button > .toolbarbutton-text { font: var(--fe-font) !important; color: var(--fe-text) !important; }
+#nav-bar .toolbaritem-combined-buttons { margin-inline: 0 !important; }
+#nav-bar .toolbaritem-combined-buttons > separator { display: none !important; }
+
+/* palette items in Customize mode look like the toolbar */
+#customization-palette .toolbarbutton-1 .toolbarbutton-icon,
+#customization-palette .toolbarbutton-1 .toolbarbutton-badge-stack {
+  width: 20px !important; height: 20px !important; padding: 0 !important;
+  background: none !important; box-shadow: none !important;
+}
+#customization-palette .toolbarpaletteitem-label, #customization-palette label { font: var(--fe-font) !important; color: var(--fe-text) !important; }
+#wrapper-search-container #searchbar, #search-container #searchbar,
+#search-container .searchbar-textbox, #wrapper-search-container moz-urlbar, #search-container moz-urlbar {
+  border-radius: 0 !important;
+  background: var(--fe-window) !important;
+  box-shadow: var(--fe-sunken) !important;
+  border: 0 !important;
+  --urlbar-border-radius: 0px !important;
+  --toolbar-field-border-color: transparent !important;
+}
+#search-container :is(.urlbar-background, #searchbar-background) { border-radius: 0 !important; box-shadow: var(--fe-sunken) !important; border: 0 !important; }
+
+/* ===================================================================== sidebar launcher
+   (the column of tool buttons in newer Firefox) */
+sidebar-main, #sidebar-main {
+  background: var(--fe-face) !important;
+  color: var(--fe-text) !important;
+  border-inline-end: 1px solid var(--fe-shadow) !important;
+  box-shadow: inset -1px 0 var(--fe-hi) !important;
+  --button-background-color-ghost-hover: transparent !important;
+  --button-background-color-ghost-active: transparent !important;
+  --button-background-color-ghost-selected: var(--fe-light) !important;
+  --button-border-color-ghost-hover: var(--fe-shadow) !important;
+  --button-border-color-ghost-selected: var(--fe-shadow) !important;
+  --button-border-radius: 0px !important;
+}
+#sidebar-box { --sidebar-box-border-radius: 0px !important; border-radius: 0 !important; }
+#sidebar-box[sidebar-launcher-expanded], #sidebar-wrapper, #sidebar-launcher-splitter { border-radius: 0 !important; }
+#sidebar { background: var(--fe-face) !important; border-radius: 0 !important; }
+
+/* Downloads: Firefox draws this button's icon on a separate indicator image */
+#downloads-indicator-icon {
+  list-style-image: url("icons/downloads.svg") !important;
+  -moz-context-properties: none !important;
+  width: 20px !important; height: 20px !important;
+}
+#nav-bar #downloads-indicator-icon { filter: var(--fe-cold-filter); }
+#nav-bar #downloads-button:not([disabled]):is(:hover, [open]) #downloads-indicator-icon { filter: none; }

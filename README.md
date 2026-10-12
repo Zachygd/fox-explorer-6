@@ -8,6 +8,10 @@ Fox Explorer 6 is built from Mozilla's Firefox source ([mozilla-firefox/firefox]
 It's still a current Firefox underneath, so tabs, Firefox extensions, Sync, private windows and
 every modern setting work as normal. Only the look changes:
 
+- **Search button:** IE6's Search lists your search engines; pick one to make it the default and
+  type in the Address bar. **Manage Search Engines…** opens Firefox's search settings.
+- **Windows 98 everywhere else:** classic scroll bars (with arrow buttons) on web pages and in the
+  browser, plus Win98 controls in the sidebar, the Library, and the Add/Edit bookmark windows.
 - **The IE6 window, top to bottom:** a Windows 98 caption bar with gradient and _ □ × buttons, then
   the File · Edit · View · Favorites · Tools · Help menu bar with an animated logo box on the right.
   Below that come the **Standard Buttons** (Back, Forward, Stop, Refresh, Home │ Search, Favorites,
@@ -54,13 +58,18 @@ Options: `--channel esr` (Firefox ESR instead of release), `--version 158.0.1`, 
 ### The original IE6 icons (optional)
 
 Fox Explorer ships with its own Win98-style icons. If you have an Internet Explorer 6 setup CD
-image, the build can use the **real IE6 toolbar and status-bar icons** from it instead: the grey
-"cold" buttons that light up in colour on hover, the Go arrow, the IE page icon, padlock and
-Internet-zone globe.
+image, the build uses the **real IE6 icons** from it instead: the toolbar buttons (grey until you
+point at them, then colour), Go, Downloads, the Edit/Explorer tools in Customize, the Favorites and
+History sidebar icons, the padlock and the Internet-zone globe.
+
+This happens **automatically** when an IE6 CD image is in `~/Downloads`, your home folder or the
+project folder (named like `IE6.iso`) and `cabextract` is installed:
 
 ```bash
 sudo dnf install cabextract
-scripts/build-repack.sh --rpm --ie6-icons ~/Downloads/IE6.iso
+scripts/build-repack.sh --rpm                      # finds ~/Downloads/IE6.iso by itself
+scripts/build-repack.sh --rpm --ie6-icons /path/to/IE6.iso
+scripts/build-repack.sh --rpm --no-ie6-icons       # always use Fox Explorer's own icons
 ```
 
 Or add them to a copy that's already installed, without rebuilding:
@@ -70,7 +79,9 @@ sudo python3 scripts/import-ie6-icons.py ~/Downloads/IE6.iso /usr/lib64/foxexplo
 ```
 
 The icons are Microsoft's artwork, so they're converted on your machine from media you own and are
-never stored in this repository (`theme/fe6/ie6/` is git-ignored). Don't share builds that include them.
+never stored in this repository (`theme/fe6/ie6/` is git-ignored). That keeps the repository safe to
+publish on GitHub; just don't publish *packages* built with them. Builds without an IE6 image use
+Fox Explorer's own icon set for everything.
 
 ### Other distributions
 

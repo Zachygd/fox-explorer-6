@@ -27,4 +27,7 @@ cat > "$B/content/about-wordmark.svg" <<'SVG'
 SVG
 cp "$B/content/about-wordmark.svg" "$B/content/firefox-wordmark.svg"
 convert -background none "$B/content/about-wordmark.svg" "$B/content/about.png" 2>/dev/null || cp "$B/content/about-logo.png" "$B/content/about.png"
+# status-bar / tab page icon
+convert art/foxexplorer-page.png -trim +repage -background none -gravity center \
+        -extent "%[fx:max(w,h)]x%[fx:max(w,h)]" -filter Lanczos -resize 32x32 -strip theme/fe6/icons/page-logo.png
 echo "branding art rendered into $B"

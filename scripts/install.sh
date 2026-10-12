@@ -25,6 +25,8 @@ install -D -m 0644 "$DEST/foxexplorer/foxexplorer6.metainfo.xml" "$PREFIX/share/
 for s in 16 22 24 32 48 64 128 256; do
   install -D -m 0644 "$DEST/foxexplorer/appicons/foxexplorer6-$s.png" "$PREFIX/share/icons/hicolor/${s}x${s}/apps/foxexplorer6.png"
 done
+install -D -m 0644 "$DEST/foxexplorer/appicons/foxexplorer6.svg" "$PREFIX/share/icons/hicolor/scalable/apps/foxexplorer6.svg"
+touch "$PREFIX/share/icons/hicolor" 2>/dev/null || true
 command -v update-desktop-database >/dev/null && update-desktop-database -q "$PREFIX/share/applications" || true
 command -v gtk-update-icon-cache >/dev/null && gtk-update-icon-cache -q -t "$PREFIX/share/icons/hicolor" || true
 echo "Fox Explorer 6 installed. Start it from your app menu or run: foxexplorer6"

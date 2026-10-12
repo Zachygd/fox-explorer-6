@@ -1,0 +1,94 @@
+/* Fox Explorer 6 — shared Windows 98 palette and bevels (light + flipped dark). */
+/* ===================================================================== palette */
+:root {
+  --fe-face: #c0c0c0;
+  --fe-light: #dfdfdf;      /* outer top-left of raised controls */
+  --fe-hi: #ffffff;         /* inner top-left highlight */
+  --fe-shadow: #808080;     /* inner bottom-right shadow */
+  --fe-dark: #000000;       /* outer bottom-right shadow */
+  --fe-text: #000000;
+  --fe-graytext: #808080;
+  --fe-window: #ffffff;
+  --fe-wintext: #000000;
+  --fe-sel: #000080;
+  --fe-seltext: #ffffff;
+  --fe-cap1: #000080;
+  --fe-cap2: #1084d0;
+  --fe-capi1: #808080;
+  --fe-capi2: #b5b5b5;
+  --fe-captext: #ffffff;
+  --fe-capitext: #c0c0c0;
+  --fe-tip: #ffffe1;
+  --fe-tiptext: #000000;
+  --fe-link: #0000ff;
+  --fe-progress: #000080;
+  --fe-icon-filter: none;
+  --fe-cold-filter: grayscale(1);
+  --fe-disabled-filter: grayscale(1) opacity(.45);
+  --fe-font: 11px "MS Sans Serif", "Microsoft Sans Serif", "Tahoma", "Liberation Sans", "Arial", sans-serif;
+  --fe-font-bold: bold 11px "MS Sans Serif", "Microsoft Sans Serif", "Tahoma", "Liberation Sans", "Arial", sans-serif;
+}
+:root[fe6-scheme="dark"] {
+  --fe-face: #3f3f3f;
+  --fe-light: #4c4c4c;
+  --fe-hi: #6e6e6e;
+  --fe-shadow: #1f1f1f;
+  --fe-dark: #000000;
+  --fe-text: #ffffff;
+  --fe-graytext: #8f8f8f;
+  --fe-window: #000000;
+  --fe-wintext: #ffffff;
+  --fe-sel: #2a4fbf;
+  --fe-seltext: #ffffff;
+  --fe-cap1: #0b1a5c;
+  --fe-cap2: #1f5f99;
+  --fe-capi1: #2f2f2f;
+  --fe-capi2: #4a4a4a;
+  --fe-captext: #ffffff;
+  --fe-capitext: #9a9a9a;
+  --fe-tip: #1e1e00;
+  --fe-tiptext: #ffffff;
+  --fe-link: #8fb4ff;
+  --fe-progress: #3a6ad8;
+  --fe-cold-filter: grayscale(1) brightness(1.6);
+  --fe-disabled-filter: grayscale(1) brightness(1.2) opacity(.35);
+}
+:root {
+  /* reusable bevels (Win98 draws them with two 1px lines on each side) */
+  --fe-raised: inset -1px -1px var(--fe-dark), inset 1px 1px var(--fe-hi), inset -2px -2px var(--fe-shadow), inset 2px 2px var(--fe-light);
+  --fe-pressed: inset -1px -1px var(--fe-hi), inset 1px 1px var(--fe-dark), inset -2px -2px var(--fe-light), inset 2px 2px var(--fe-shadow);
+  --fe-sunken: inset -1px -1px var(--fe-hi), inset 1px 1px var(--fe-shadow), inset -2px -2px var(--fe-light), inset 2px 2px var(--fe-dark);
+  --fe-thin-raised: inset -1px -1px var(--fe-shadow), inset 1px 1px var(--fe-hi);
+  --fe-thin-sunken: inset -1px -1px var(--fe-hi), inset 1px 1px var(--fe-shadow);
+  --fe-gripper: linear-gradient(to right, var(--fe-hi) 0 1px, var(--fe-face) 1px 2px, var(--fe-shadow) 2px 3px);
+}
+
+/* documents other than the main window (sidebar pages, Library, dialogs) don't carry the
+   fe6-scheme attribute: they follow prefers-color-scheme, which Fox Explorer sets to match */
+@media (prefers-color-scheme: dark) {
+  :root:not([fe6-scheme]) {
+  --fe-face: #3f3f3f;
+  --fe-light: #4c4c4c;
+  --fe-hi: #6e6e6e;
+  --fe-shadow: #1f1f1f;
+  --fe-dark: #000000;
+  --fe-text: #ffffff;
+  --fe-graytext: #8f8f8f;
+  --fe-window: #000000;
+  --fe-wintext: #ffffff;
+  --fe-sel: #2a4fbf;
+  --fe-seltext: #ffffff;
+  --fe-cap1: #0b1a5c;
+  --fe-cap2: #1f5f99;
+  --fe-capi1: #2f2f2f;
+  --fe-capi2: #4a4a4a;
+  --fe-captext: #ffffff;
+  --fe-capitext: #9a9a9a;
+  --fe-tip: #1e1e00;
+  --fe-tiptext: #ffffff;
+  --fe-link: #8fb4ff;
+  --fe-progress: #3a6ad8;
+  --fe-cold-filter: grayscale(1) brightness(1.6);
+  --fe-disabled-filter: grayscale(1) brightness(1.2) opacity(.35);
+}
+}

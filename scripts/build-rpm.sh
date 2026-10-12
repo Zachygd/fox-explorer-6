@@ -13,6 +13,7 @@ export QA_RPATHS=$(( 0x0001 | 0x0002 | 0x0004 | 0x0008 | 0x0010 | 0x0020 ))
 rpmbuild -bb "$HERE/packaging/foxexplorer6.spec" \
   --define "_topdir $TOP" \
   --define "fe_version $RPMVER" \
+  --define "fe_release $(date +%Y%m%d%H%M)" \
   --define "fe_tarball $(basename "$TARBALL")"
 mkdir -p "$HERE/dist"
 find "$TOP/RPMS" -name '*.rpm' -exec cp {} "$HERE/dist/" \; -print

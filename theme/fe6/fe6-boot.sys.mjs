@@ -5,6 +5,22 @@
 
 const CSS_URI = "resource://fe6/fe6.css";
 const AGENT_CSS_URI = "resource://fe6/fe6-agent.css";
+const CHROME_CSS_URI = "resource://fe6/fe6-chrome.css";
+// Firefox UI documents that get the Win98 controls sheet (sidebar pages, Library, dialogs)
+const CHROME_DOC_PREFIXES = [
+  "chrome://browser/content/sidebar/",
+  "chrome://browser/content/places/",
+  "chrome://browser/content/genai/",
+  "chrome://browser/content/syncedtabs/",
+  "chrome://global/content/megalist/",
+  "chrome://global/content/commonDialog",
+  "chrome://browser/content/downloads/",
+  "chrome://mozapps/content/downloads/",
+  "chrome://browser/content/pageinfo/",
+  "chrome://browser/content/sanitize",
+  "chrome://browser/content/aboutDialog",
+  "chrome://global/content/print.html",
+];
 // Optional: original IE6 icons converted from the user's own IE6 CD by scripts/import-ie6-icons.py
 const IE6_CSS_URI = "resource://fe6/ie6/ie6.css";
 let ie6IconsPresent = null;
@@ -28,7 +44,7 @@ const PREF = {
   appMenu: "foxexplorer.showAppMenu",
   layout: "foxexplorer.layoutVersion",     // int, user pref: which default layout has been applied
 };
-const LAYOUT_VERSION = 1;
+const LAYOUT_VERSION = 2;
 const XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
 /* CustomizableUI moved from resource:///modules/ to moz-src:/// around Firefox 150;
@@ -102,62 +118,109 @@ function setScheme(value) {
 }
 
 /* ------------------------------------------------------------------ toolbar widgets */
+/* Each IE6 button is wired to a <command> element (Firefox's own mechanism for its toolbar
+   buttons): the button carries command="…", so clicks work regardless of CustomizableUI
+   internals, and buttons follow their command's disabled state (e.g. Stop). Firefox's
+   built-in commands are used where one exists; ours are added to every window. */
+const FE6_COMMANDS = {
+  "fe6-cmd-favorites": win => toggleSidebar(win, "viewBookmarksSidebar"),
+  "fe6-cmd-history": win => toggleSidebar(win, "viewHistorySidebar"),
+  "fe6-cmd-go": (win, ev) => {
+    if (win.gURLBar.value) win.gURLBar.handleCommand(ev);
+    else win.gURLBar.focus();
+  },
+  "fe6-cmd-refresh": (win, ev) => {
+    const bypass = ev && (ev.shiftKey || ev.ctrlKey);
+    const id = bypass ? "Browser:ReloadSkipCache" : "Browser:Reload";
+    const cmd = win.document.getElementById(id);
+    if (cmd) cmd.doCommand();
+    else if (win.BrowserCommands) bypass ? win.BrowserCommands.reloadSkipCache() : win.BrowserCommands.reload();
+  },
+};
+const BUTTON_COMMANDS = {
+  "fe6-stop-button": "Browser:Stop",
+  "fe6-refresh-button": "fe6-cmd-refresh",
+  "fe6-favorites-button": "fe6-cmd-favorites",
+  "fe6-history-button": "fe6-cmd-history",
+  "fe6-mail-button": "Browser:SendLink",
+  "fe6-print-button": "cmd_print",
+  "fe6-go-button": "fe6-cmd-go",
+};
+
+function toggleSidebar(win, id) {
+  if (win.SidebarController) win.SidebarController.toggle(id);
+  else if (win.SidebarUI) win.SidebarUI.toggle(id);
+}
+
+function installCommands(win) {
+  const doc = win.document;
+  const set = doc.getElementById("mainCommandSet") || doc.querySelector("commandset");
+  if (!set) return;
+  for (const [id, fn] of Object.entries(FE6_COMMANDS)) {
+    if (doc.getElementById(id)) continue;
+    const c = doc.createXULElement("command");
+    c.id = id;
+    c.addEventListener("command", ev => {
+      try {
+        fn(win, ev.sourceEvent || ev);
+      } catch (e) {
+        console.error("[Fox Explorer 6]", id, e);
+      }
+    });
+    set.append(c);
+  }
+}
+
 let widgetsCreated = false;
 function createWidgets() {
   if (widgetsCreated) return;
   widgetsCreated = true;
   const CUI = lazy.CustomizableUI;
-  const button = (id, label, tooltip, onCommand, extra = {}) => {
+  const button = (id, label, tooltip) => {
     try {
       CUI.createWidget({
         id, label, tooltiptext: tooltip, type: "button",
         defaultArea: null, removable: true,
-        onCommand(event) { onCommand(event.target.ownerGlobal, event); },
-        ...extra,
+        onCreated(node) {
+          node.setAttribute("command", BUTTON_COMMANDS[id]);
+        },
       });
     } catch (e) { log("createWidget failed", id, e); }
   };
+  button("fe6-stop-button", "Stop", "Stop");
+  button("fe6-refresh-button", "Refresh", "Refresh (Shift+click: reload without cache)");
+  button("fe6-favorites-button", "Favorites", "Favorites");
+  button("fe6-history-button", "History", "History");
+  button("fe6-mail-button", "Mail", "Mail a link to this page");
+  button("fe6-print-button", "Print", "Print");
+  button("fe6-go-button", "Go", "Go to the address in the Address bar");
 
-  button("fe6-stop-button", "Stop", "Stop", win => win.BrowserCommands ? win.BrowserCommands.stop() : win.BrowserStop(), {
-    onCreated(node) { node.setAttribute("disabled", "true"); },
-  });
-  button("fe6-refresh-button", "Refresh", "Refresh", (win, ev) => {
-    const bypass = ev.shiftKey || ev.ctrlKey;
-    if (win.BrowserCommands) {
-      bypass ? win.BrowserCommands.reloadSkipCache() : win.BrowserCommands.reload();
-    } else {
-      bypass ? win.BrowserReloadSkipCache() : win.BrowserReload();
-    }
-  });
-  button("fe6-search-button", "Search", "Search the Web", win => {
-    win.gURLBar.focus();
-    try {
-      win.gURLBar.searchMode = { engineName: Services.search.defaultEngine?.name, entry: "other" };
-    } catch (e) {}
-    win.gURLBar.select();
-  });
-  const sidebar = (win, id) => {
-    if (win.SidebarController) win.SidebarController.toggle(id);
-    else if (win.SidebarUI) win.SidebarUI.toggle(id);
-  };
-  button("fe6-favorites-button", "Favorites", "Favorites", win => sidebar(win, "viewBookmarksSidebar"));
-  button("fe6-history-button", "History", "History", win => sidebar(win, "viewHistorySidebar"));
-  button("fe6-mail-button", "Mail", "Mail", win => {
-    const uri = win.gBrowser.currentURI?.spec || "";
-    const title = win.gBrowser.contentTitle || "";
-    win.openTrustedLinkIn(`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(uri)}`, "current");
-  });
-  button("fe6-print-button", "Print", "Print", win => {
-    if (win.PrintUtils?.startPrintWindow) {
-      win.PrintUtils.startPrintWindow(win.gBrowser.selectedBrowser.browsingContext);
-    } else {
-      win.goDoCommand("cmd_print");
-    }
-  });
-  button("fe6-go-button", "Go", "Go to the address in the Address bar", (win, ev) => {
-    if (win.gURLBar.value) win.gURLBar.handleCommand(ev);
-    else win.gURLBar.focus();
-  });
+  /* Search: a drop-down of the installed search engines (replaces the picker that used to
+     sit inside the Address bar). Picking one makes it the default and puts the cursor in
+     the Address bar, ready to type. */
+  try {
+    CUI.createWidget({
+      id: "fe6-search-button", type: "custom", removable: true, defaultArea: null, label: "Search",
+      onBuild(doc) {
+        const win = doc.ownerGlobal;
+        const btn = doc.createXULElement("toolbarbutton");
+        btn.id = "fe6-search-button";
+        btn.className = "toolbarbutton-1 chromeclass-toolbar-additional";
+        btn.setAttribute("type", "menu");
+        btn.setAttribute("label", "Search");
+        btn.setAttribute("tooltiptext", "Choose a search engine");
+        btn.setAttribute("removable", "true");
+        const popup = doc.createXULElement("menupopup");
+        popup.id = "fe6-search-popup";
+        popup.addEventListener("popupshowing", async e => {
+          if (e.target != popup) return;
+          await fillSearchMenu(win, popup);
+        });
+        btn.append(popup);
+        return btn;
+      },
+    });
+  } catch (e) { log("search widget", e); }
 
   try {
     CUI.createWidget({
@@ -199,6 +262,53 @@ function createWidgets() {
       },
     });
   } catch (e) { log("throbber widget", e); }
+}
+
+async function fillSearchMenu(win, popup) {
+  const doc = win.document;
+  popup.replaceChildren();
+  const head = doc.createXULElement("menuitem");
+  head.setAttribute("label", "Search the Web…");
+  head.setAttribute("style", "font-weight: bold");
+  head.addEventListener("command", () => { win.gURLBar.focus(); win.gURLBar.select(); });
+  popup.append(head, doc.createXULElement("menuseparator"));
+  let engines = [], current = null;
+  try {
+    engines = await Services.search.getVisibleEngines();
+    current = await Services.search.getDefault();
+  } catch (e) {
+    log("search engines", e);
+  }
+  for (const engine of engines) {
+    const mi = doc.createXULElement("menuitem");
+    mi.setAttribute("type", "radio");
+    mi.setAttribute("name", "fe6-engine");
+    mi.setAttribute("label", engine.name);
+    if (current && engine.name == current.name) {
+      mi.setAttribute("checked", "true");
+      mi.setAttribute("style", "font-weight: bold");
+      mi.setAttribute("tooltiptext", "Current search engine");
+    }
+    mi.classList.add("menuitem-iconic");
+    try {
+      const icon = typeof engine.getIconURL == "function" ? await engine.getIconURL(16) : engine.iconURI?.spec;
+      if (icon) mi.setAttribute("image", icon);
+    } catch (e) {}
+    mi.addEventListener("command", async () => {
+      try {
+        await Services.search.setDefault(engine, Ci.nsISearchService.CHANGE_REASON_USER);
+      } catch (e) {
+        log("setDefault", e);
+      }
+      win.gURLBar.focus();
+      win.gURLBar.select();
+    });
+    popup.append(mi);
+  }
+  const manage = doc.createXULElement("menuitem");
+  manage.setAttribute("label", "Manage Search Engines…");
+  manage.addEventListener("command", () => win.openPreferences("paneSearch"));
+  popup.append(doc.createXULElement("menuseparator"), manage);
 }
 
 /* One-time default layout (IE6 Standard Buttons). Re-run by setting foxexplorer.layoutVersion to 0. */
@@ -339,7 +449,6 @@ function buildStatusBar(win) {
   const zone = bar.querySelector("#fe6-status-zone");
   const zoneLabel = bar.querySelector("#fe6-status-zone-label");
   const throbber = () => doc.getElementById("fe6-throbber");
-  const stopBtn = () => doc.getElementById("fe6-stop-button");
 
   const state = { busy: false };
   const refreshText = () => {
@@ -352,8 +461,6 @@ function buildStatusBar(win) {
     state.busy = busy;
     doc.documentElement.toggleAttribute("fe6-busy", busy);
     throbber()?.toggleAttribute("busy", busy);
-    const s = stopBtn();
-    if (s) busy ? s.removeAttribute("disabled") : s.setAttribute("disabled", "true");
     progressPane.toggleAttribute("active", busy);
     if (!busy) meter.style.width = "0%";
     refreshText();
@@ -413,6 +520,48 @@ function buildStatusBar(win) {
   onTabSelect();
 }
 
+/* Sidebar launcher (newer Firefox): give its tools Win98 icons. */
+const SIDEBAR_ICONS = {
+  viewHistorySidebar: "history",
+  viewBookmarksSidebar: "favorites",
+  viewTabsSidebar: "synced",
+  viewGenaiChatSidebar: "chat",
+  viewGenaiPageAssistSidebar: "reader",
+  viewCPMSidebar: "key",
+  viewResourceMonitorSidebar: "monitor",
+  viewCustomizeSidebar: "customize",
+};
+const IE6_SIDEBAR_ICONS = { history: "history-hot.png", favorites: "favorites-hot.png" };
+function themeSidebarTools(win) {
+  const SC = win.SidebarController;
+  if (!SC || !SC.sidebars) return;
+  let changed = false;
+  // the launcher reads copies held in toolsAndExtensions, so update both maps
+  let tools = null;
+  try { tools = SC.toolsAndExtensions; } catch (e) {}
+  for (const [id, name] of Object.entries(SIDEBAR_ICONS)) {
+    const url = hasIE6Icons() && IE6_SIDEBAR_ICONS[name]
+      ? "resource://fe6/ie6/" + IE6_SIDEBAR_ICONS[name]
+      : "resource://fe6/icons/" + name + ".svg";
+    for (const entry of [SC.sidebars.get?.(id), tools?.get?.(id)]) {
+      if (entry && entry.iconUrl !== url) {
+        entry.iconUrl = url;
+        changed = true;
+      }
+    }
+  }
+  if (changed) {
+    const main = win.document.querySelector("sidebar-main");
+    main?.requestUpdate?.();
+  }
+}
+
+/* Firefox 150+ treats the mere presence of checked="…" as checked, so remove it to uncheck. */
+function setChecked(node, on) {
+  if (on) node.setAttribute("checked", "true");
+  else node.removeAttribute("checked");
+}
+
 /* menus: File Edit View Favorites Tools Help */
 function relabel(doc, id, label, accesskey) {
   const n = doc.getElementById(id);
@@ -444,9 +593,9 @@ function buildMenus(win) {
     }
     popup.addEventListener("popupshowing", () => {
       const cur = getPref(PREF.scheme, "light");
-      for (const mi of popup.children) mi.setAttribute("checked", mi.getAttribute("value") === cur);
+      for (const mi of popup.children) setChecked(mi, mi.getAttribute("value") === cur);
     });
-    viewPopup.addEventListener("popupshowing", () => sb.setAttribute("checked", getPref(PREF.statusbar, true)));
+    viewPopup.addEventListener("popupshowing", () => setChecked(sb, getPref(PREF.statusbar, true)));
     const schemeMenu = el(doc, "menu", { id: "fe6-scheme-menu", label: "Color Scheme", accesskey: "C" }, [popup]);
     const anchor = doc.getElementById("viewToolbarsMenu");
     if (anchor) {
@@ -469,12 +618,19 @@ function buildMenus(win) {
 function initWindow(win) {
   const doc = win.document;
   if (doc.documentElement.getAttribute("windowtype") !== "navigator:browser") return;
-  for (const [name, fn] of [["attrs", syncWindowAttrs], ["caption", buildCaption], ["statusbar", buildStatusBar], ["menus", buildMenus]]) {
+  for (const [name, fn] of [["commands", installCommands], ["attrs", syncWindowAttrs], ["caption", buildCaption], ["statusbar", buildStatusBar], ["menus", buildMenus]]) {
     try {
       fn(win);
     } catch (e) {
       console.error(`[Fox Explorer 6] ${name} failed`, e);
     }
+  }
+  try {
+    themeSidebarTools(win);
+    win.setTimeout(() => { try { themeSidebarTools(win); } catch (e) {} }, 2500);
+    win.SidebarController?.promiseInitialized?.then(() => themeSidebarTools(win)).catch(() => {});
+  } catch (e) {
+    console.error("[Fox Explorer 6] sidebar icons failed", e);
   }
   try {
     // follow desktop light/dark changes while in "system" mode
@@ -497,6 +653,7 @@ function injectSheet(win) {
     if (win.__fe6Sheet) return;
     win.__fe6Sheet = true;
     win.windowUtils.loadSheetUsingURIString(CSS_URI, win.windowUtils.AUTHOR_SHEET);
+    win.windowUtils.loadSheetUsingURIString(CHROME_CSS_URI, win.windowUtils.AUTHOR_SHEET);
     try {
       win.windowUtils.loadSheetUsingURIString(AGENT_CSS_URI, win.windowUtils.AGENT_SHEET);
     } catch (e) {
@@ -553,6 +710,18 @@ function injectPreferences(win) {
   else win.addEventListener("load", () => win.setTimeout(build, 0), { once: true });
 }
 
+/* Win98 scroll bars everywhere (web pages, sidebars, dialogs): one global agent sheet,
+   which Firefox also hands to content processes. */
+function registerGlobalSheets() {
+  try {
+    const sss = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService);
+    const uri = Services.io.newURI("resource://fe6/fe6-scrollbars.css");
+    if (!sss.sheetRegistered(uri, sss.AGENT_SHEET)) sss.loadAndRegisterSheet(uri, sss.AGENT_SHEET);
+  } catch (e) {
+    console.error("[Fox Explorer 6] scroll bar sheet failed", e);
+  }
+}
+
 /* ------------------------------------------------------------------ bootstrap */
 let started = false;
 export const FoxExplorer6 = {
@@ -560,6 +729,7 @@ export const FoxExplorer6 = {
     if (started) return;
     started = true;
     applyGlobalScheme();
+    registerGlobalSheets();
 
     Services.obs.addObserver(subject => {
       const doc = subject;
@@ -568,6 +738,13 @@ export const FoxExplorer6 = {
       const href = doc.documentURI || "";
       if (href.startsWith("chrome://browser/content/browser.xhtml")) {
         injectSheet(win);
+      } else if (CHROME_DOC_PREFIXES.some(p => href.startsWith(p))) {
+        try {
+          win.windowUtils.loadSheetUsingURIString(CHROME_CSS_URI, win.windowUtils.AUTHOR_SHEET);
+          win.windowUtils.loadSheetUsingURIString(AGENT_CSS_URI, win.windowUtils.AGENT_SHEET);
+        } catch (e) {
+          log("chrome doc sheet", href, e);
+        }
       } else if (href.startsWith("about:preferences") || href.startsWith("about:settings")) {
         win.addEventListener("DOMContentLoaded", () => injectPreferences(win), { once: true });
       }
@@ -575,7 +752,7 @@ export const FoxExplorer6 = {
 
     Services.obs.addObserver(win => {
       // each step on its own, so a change in one Firefox version can't take out the rest
-      for (const [name, step] of [["widgets", createWidgets], ["layout", applyDefaultLayout], ["window", () => initWindow(win)]]) {
+      for (const [name, step] of [["commands", () => installCommands(win)], ["widgets", createWidgets], ["layout", applyDefaultLayout], ["window", () => initWindow(win)]]) {
         try {
           step();
         } catch (e) {
