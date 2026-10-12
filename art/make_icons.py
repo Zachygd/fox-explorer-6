@@ -84,38 +84,6 @@ svg("folder.svg", 16,
 svg("menu.svg", 20, f'<rect x="3" y="4" width="14" height="2" fill="{K}"/><rect x="3" y="9" width="14" height="2" fill="{K}"/><rect x="3" y="14" width="14" height="2" fill="{K}"/>')
 svg("sidebar.svg", 20, f'<rect x="1.5" y="2.5" width="17" height="15" fill="{W}" stroke="{K}"/><rect x="2" y="3" width="6" height="14" fill="{S}"/><path d="M8.5,3 V17" stroke="{K}"/>')
 
-# --- Fox Explorer emblem: an orange fox face in front of a blue globe (original design) ---
-def emblem(scale=1.0, spin=False):
-    s = scale
-    meridians = (f'<g stroke="#7fb2ff" stroke-width="{1.1*s}" fill="none" shape-rendering="geometricPrecision">'
-                 f'<ellipse cx="{16*s}" cy="{16*s}" rx="{6*s}" ry="{13*s}"/><path d="M{3.2*s},{11*s} H{28.8*s} M{3.2*s},{21*s} H{28.8*s}"/>')
-    if spin:
-        meridians += (f'<animateTransform attributeName="transform" type="scale" values="1 1;0.1 1;1 1" keyTimes="0;0.5;1" '
-                      f'dur="1.2s" repeatCount="indefinite" additive="sum"/>')
-    meridians += '</g>'
-    if spin:   # keep the scale centred on the globe
-        meridians = f'<g transform="translate({16*s} 0)"><g transform="translate({-16*s} 0)">{meridians}</g></g>'
-        meridians = (f'<g><g transform="translate({16*s},{16*s})"><g>'
-                     f'<animateTransform attributeName="transform" type="scale" values="1 1;0.15 1;1 1" dur="1.2s" repeatCount="indefinite"/>'
-                     f'<g transform="translate({-16*s},{-16*s})" stroke="#7fb2ff" stroke-width="{1.1*s}" fill="none" shape-rendering="geometricPrecision">'
-                     f'<ellipse cx="{16*s}" cy="{16*s}" rx="{6*s}" ry="{13*s}"/></g></g></g>'
-                     f'<path d="M{3.2*s},{11*s} H{28.8*s} M{3.2*s},{21*s} H{28.8*s}" stroke="#7fb2ff" stroke-width="{1.1*s}" shape-rendering="geometricPrecision"/></g>')
-    g = s
-    return (f'<circle cx="{16*g}" cy="{16*g}" r="{13*g}" fill="#1a4fd0" stroke="{N}" stroke-width="{1.2*g}" shape-rendering="geometricPrecision"/>'
-            + meridians +
-            f'<g shape-rendering="geometricPrecision" stroke="#5a1e00" stroke-width="{1*g}" stroke-linejoin="round">'
-            f'<polygon points="{9*g},{12*g} {11*g},{4*g} {15*g},{10*g}" fill="#ff8a1c"/>'
-            f'<polygon points="{23*g},{12*g} {21*g},{4*g} {17*g},{10*g}" fill="#ff8a1c"/>'
-            f'<polygon points="{7.5*g},{12.5*g} {16*g},{9*g} {24.5*g},{12.5*g} {16*g},{25*g}" fill="#ff8a1c"/>'
-            f'<polygon points="{9.5*g},{14*g} {16*g},{17*g} {16*g},{25*g}" fill="#fff4e0" stroke="none"/>'
-            f'<polygon points="{22.5*g},{14*g} {16*g},{17*g} {16*g},{25*g}" fill="#fff4e0" stroke="none"/>'
-            f'<polygon points="{14.6*g},{23.2*g} {17.4*g},{23.2*g} {16*g},{25.4*g}" fill="#1a1a1a" stroke="none"/>'
-            f'<circle cx="{12.6*g}" cy="{15.2*g}" r="{1.1*g}" fill="#1a1a1a" stroke="none"/><circle cx="{19.4*g}" cy="{15.2*g}" r="{1.1*g}" fill="#1a1a1a" stroke="none"/>'
-            f'</g>')
-
-svg("throbber.svg", 32, emblem())
-svg("throbber-busy.svg", 32, emblem(spin=True))
-svg("foxexplorer.svg", 32, emblem())
 print("icons written to", os.path.abspath(OUT))
 
 # Win98 caption-button glyphs (drawn in the current text colour via context-fill)
@@ -126,3 +94,5 @@ svg("cap-restore.svg", 16, f'<path d="M5,2 H12 V8 H10 V7 H11 V4 H6 V5 H5 Z" {cf}
 svg("cap-close.svg", 16, f'<path d="M4,3 H6 L7.5,5 L9,3 H11 L8.5,6.5 L11,10 H9 L7.5,8 L6,10 H4 L6.5,6.5 Z" {cf}/>')
 svg("menu-check.svg", 16, f'<path d="M4,7 L6,9 L11,4 V6 L6,11 L4,9 Z" {cf}/>')
 svg("menu-radio.svg", 16, f'<rect x="6" y="6" width="4" height="4" {cf}/><rect x="5" y="7" width="6" height="2" {cf}/><rect x="7" y="5" width="2" height="6" {cf}/>')
+# "List all tabs": a Win98 combo-box drop arrow
+svg("alltabs.svg", 16, f'<path d="M4,6 H12 L8,10 Z" {cf}/>')

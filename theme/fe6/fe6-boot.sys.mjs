@@ -4,6 +4,22 @@
  * tabs, customise mode and about:preferences keep working. */
 
 const CSS_URI = "resource://fe6/fe6.css";
+const AGENT_CSS_URI = "resource://fe6/fe6-agent.css";
+// Optional: original IE6 icons converted from the user's own IE6 CD by scripts/import-ie6-icons.py
+const IE6_CSS_URI = "resource://fe6/ie6/ie6.css";
+let ie6IconsPresent = null;
+function hasIE6Icons() {
+  if (ie6IconsPresent === null) {
+    try {
+      const res = Services.io.getProtocolHandler("resource").QueryInterface(Ci.nsIResProtocolHandler);
+      const spec = res.resolveURI(Services.io.newURI(IE6_CSS_URI));
+      ie6IconsPresent = Services.io.newURI(spec).QueryInterface(Ci.nsIFileURL).file.exists();
+    } catch (e) {
+      ie6IconsPresent = false;
+    }
+  }
+  return ie6IconsPresent;
+}
 const PREF = {
   scheme: "foxexplorer.colorScheme",       // "light" | "dark" | "system"
   statusbar: "foxexplorer.statusBar",      // bool
@@ -262,7 +278,7 @@ function buildCaption(win) {
     return b;
   };
   const caption = el(doc, "hbox", { id: "fe6-caption" }, [
-    el(doc, "image", { id: "fe6-caption-icon", src: "resource://fe6/icons/foxexplorer.svg" }),
+    el(doc, "image", { id: "fe6-caption-icon", src: "resource://fe6/icons/logo.png" }),
     el(doc, "label", { id: "fe6-caption-title", crop: "end" }),
     capbtn("fe6-cap-min", "Minimize", () => win.minimize()),
     capbtn("fe6-cap-max", "Maximize", () => {
@@ -468,9 +484,6 @@ function initWindow(win) {
       const r = doc.documentElement;
       log("root attrs:", [...r.attributes].map(a => a.name + "=" + a.value).join(" "));
       log("navbar:", lazy.CustomizableUI.getWidgetIdsInArea("nav-bar").join(","));
-      const bb = doc.getElementById("back-button");
-      const t = bb?.querySelector(".toolbarbutton-text");
-      log("back label:", bb?.getAttribute("label"), "text el:", !!t, t && win.getComputedStyle(t).display, t && win.getComputedStyle(t).width, t?.getAttribute("value"));
       log("menubar:", lazy.CustomizableUI.getWidgetIdsInArea("toolbar-menubar").join(","));
     }, 3000);
   } catch (e) {
@@ -484,6 +497,14 @@ function injectSheet(win) {
     if (win.__fe6Sheet) return;
     win.__fe6Sheet = true;
     win.windowUtils.loadSheetUsingURIString(CSS_URI, win.windowUtils.AUTHOR_SHEET);
+    try {
+      win.windowUtils.loadSheetUsingURIString(AGENT_CSS_URI, win.windowUtils.AGENT_SHEET);
+    } catch (e) {
+      log("agent sheet", e);
+    }
+    if (hasIE6Icons()) {
+      win.windowUtils.loadSheetUsingURIString(IE6_CSS_URI, win.windowUtils.AUTHOR_SHEET);
+    }
     win.document.documentElement?.setAttribute("fe6-scheme", effectiveScheme(win));
   } catch (e) {
     console.error("[Fox Explorer 6] stylesheet failed", e);

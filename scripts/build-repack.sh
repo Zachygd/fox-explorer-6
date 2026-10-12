@@ -12,9 +12,10 @@
 # Usage:
 #   scripts/build-repack.sh [--channel release|esr] [--version 158.0.1] [--lang en-US]
 #                           [--from firefox-xxx.tar.xz|DIR] [--rpm] [--no-gpg]
+#                           [--ie6-icons /path/to/IE6.iso]   (use the real IE6 icons from your own CD)
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CHANNEL=release; VERSION=latest; LANG_CODE=en-US; FROM=""; RPM=0; GPG=1
+CHANNEL=release; VERSION=latest; LANG_CODE=en-US; FROM=""; RPM=0; GPG=1; IE6_MEDIA=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --channel) CHANNEL="$2"; shift 2;;
@@ -23,6 +24,7 @@ while [ $# -gt 0 ]; do
     --from) FROM="$2"; shift 2;;
     --rpm) RPM=1; shift;;
     --no-gpg) GPG=0; shift;;
+    --ie6-icons) IE6_MEDIA="$2"; shift 2;;
     -h|--help) sed -n 2,17p "$0"; exit 0;;
     *) echo "unknown option: $1" >&2; exit 2;;
   esac
@@ -96,6 +98,10 @@ python3 "$HERE/scripts/rebrand-omni.py" "$APP" "$HERE/branding/foxexplorer"
 python3 "$HERE/scripts/make-appini.py" "$APP"
 echo "==> installing the IE6 chrome layer"
 "$HERE/scripts/apply-layer.sh" "$APP"
+if [ -n "$IE6_MEDIA" ]; then
+  echo "==> importing IE6 icons from $IE6_MEDIA"
+  python3 "$HERE/scripts/import-ie6-icons.py" "$IE6_MEDIA" "$APP/foxexplorer/ie6"
+fi
 install -D -m 0644 "$HERE/distribution/policies.json" "$APP/distribution/policies.json"
 rm -f "$APP/updater" "$APP/updater.ini" "$APP/update-settings.ini"
 

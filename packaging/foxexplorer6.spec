@@ -46,7 +46,6 @@ install -D -m 0644 foxexplorer/foxexplorer6.metainfo.xml %{buildroot}%{_metainfo
 for s in 16 22 24 32 48 64 128 256; do
   install -D -m 0644 foxexplorer/appicons/foxexplorer6-$s.png %{buildroot}%{_datadir}/icons/hicolor/${s}x${s}/apps/foxexplorer6.png
 done
-install -D -m 0644 foxexplorer/appicons/foxexplorer6.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/foxexplorer6.svg
 
 %files
 %license foxexplorer/LICENSE

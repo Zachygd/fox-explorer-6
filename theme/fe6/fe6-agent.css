@@ -1,0 +1,14 @@
+/* Fox Explorer 6 — agent-level rules. Loaded as an AGENT sheet so they also reach the
+   built-in default tooltip used by toolbar buttons (native anonymous content that ordinary
+   author sheets can't style). Colours come from fe6.css's variables, with Win98 fallbacks. */
+tooltip {
+  appearance: none !important;
+  background: var(--fe-tip, #ffffe1) !important;
+  color: var(--fe-tiptext, #000) !important;
+  border: 1px solid var(--fe-dark, #000) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 1px 3px !important;
+  font: 11px "MS Sans Serif", "Microsoft Sans Serif", Tahoma, "Liberation Sans", Arial, sans-serif !important;
+  --panel-border-radius: 0px !important;
+}

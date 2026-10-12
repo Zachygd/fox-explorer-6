@@ -24,9 +24,9 @@ every modern setting work as normal. Only the look changes:
   top-left, so buttons still look raised. Websites that support dark mode follow it.
 - **Use System Setting:** follows GNOME/KDE light or dark automatically.
 
-| Dark mode | Settings page | About box |
-|---|---|---|
-| ![dark](docs/screenshots/dark-start.png) | ![settings](docs/screenshots/settings.png) | ![about](docs/screenshots/about.png) |
+| Dark mode | Settings page |
+|---|---|
+| ![dark](docs/screenshots/dark-start.png) | ![settings](docs/screenshots/settings.png) |
 
 Switch schemes from **View › Color Scheme**, or in **Tools › Internet Options** (the
 *Fox Explorer 6* section at the top of General).
@@ -48,7 +48,29 @@ sudo dnf install dist/foxexplorer6-*.x86_64.rpm      # or .aarch64.rpm on ARM
 Then open **Fox Explorer 6** from your app grid, or run `foxexplorer6`.
 
 Options: `--channel esr` (Firefox ESR instead of release), `--version 158.0.1`, `--lang de`,
-`--from firefox-158.0.1.tar.xz` (use a tarball you already downloaded).
+`--from firefox-158.0.1.tar.xz` (use a tarball you already downloaded),
+`--ie6-icons ~/IE6.iso` (use the real IE6 icons — see below).
+
+### The original IE6 icons (optional)
+
+Fox Explorer ships with its own Win98-style icons. If you have an Internet Explorer 6 setup CD
+image, the build can use the **real IE6 toolbar and status-bar icons** from it instead: the grey
+"cold" buttons that light up in colour on hover, the Go arrow, the IE page icon, padlock and
+Internet-zone globe.
+
+```bash
+sudo dnf install cabextract
+scripts/build-repack.sh --rpm --ie6-icons ~/Downloads/IE6.iso
+```
+
+Or add them to a copy that's already installed, without rebuilding:
+
+```bash
+sudo python3 scripts/import-ie6-icons.py ~/Downloads/IE6.iso /usr/lib64/foxexplorer6/foxexplorer/ie6
+```
+
+The icons are Microsoft's artwork, so they're converted on your machine from media you own and are
+never stored in this repository (`theme/fe6/ie6/` is git-ignored). Don't share builds that include them.
 
 ### Other distributions
 
@@ -100,7 +122,8 @@ and 1–3 hours.
 | [`autoconfig/`](autoconfig) | Firefox's standard *autoconfig* hook. It loads the above at startup and sets the defaults. |
 | [`branding/foxexplorer/`](branding/foxexplorer) | Names, icons and About-box art. Source builds use it via `--with-branding`; the quick build patches it into `omni.ja` ([`scripts/rebrand-omni.py`](scripts/rebrand-omni.py)). |
 | [`scripts/make-appini.py`](scripts/make-appini.py) | Gives Fox Explorer its own profile (`~/.mozilla/foxexplorer6`) and window class, so it sits beside a normal Firefox without sharing anything. Internally the app is still named *Firefox*, so websites and addons.mozilla.org treat it as Firefox. |
-| [`art/`](art) | Scripts that generate the icon set and app logo. |
+| [`art/`](art) | The app logo and the scripts that generate the icon set and branding sizes. |
+| [`scripts/import-ie6-icons.py`](scripts/import-ie6-icons.py) | Optional: converts the original IE6 icons from your own IE6 CD image into the build. |
 
 ### Settings
 
@@ -119,9 +142,11 @@ Your own `userChrome.css` still works on top (`toolkit.legacyUserProfileCustomiz
 
 ### Good to know
 
-- **Artwork is original.** The toolbar icons, the fox-and-globe logo and the throbber were drawn for
-  this project in a Win98-style 16-colour palette. Microsoft's own IE6 icons and logo aren't copied.
-  The layout, metrics and colours follow IE6 on Windows 98.
+- **Artwork:** the default toolbar icons were drawn for this project in a Win98-style 16-colour
+  palette. The app logo is in [`art/foxexplorer-logo.png`](art/foxexplorer-logo.png); run
+  `art/make_branding.sh` after replacing it to regenerate every icon size. The logo combines
+  elements of the Firefox and Internet Explorer logos, which are trademarks of Mozilla and
+  Microsoft, so it's fine for personal use but worth replacing before publishing builds.
 - **Fonts:** the UI asks for *MS Sans Serif / Tahoma* and falls back to Liberation Sans or Arial. For
   the most authentic text, install a Tahoma-compatible font, for example from Wine:
   `sudo dnf install wine-tahoma-fonts-system` (the `-system` package makes it available to all apps).

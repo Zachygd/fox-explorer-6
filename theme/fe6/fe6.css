@@ -249,14 +249,15 @@ body, #browser { background: var(--fe-face) !important; color: var(--fe-text) !i
   margin-inline-start: auto !important;
   width: 38px; height: 22px;
   display: flex; align-items: center; justify-content: center;
-  background: #000000;
+  background: var(--fe-window);
   border-inline-start: 1px solid var(--fe-shadow);
   box-shadow: inset 1px 0 var(--fe-hi);
   padding: 0 !important;
 }
-:root[fe6-scheme="dark"] #fe6-throbber { background: #000; }
-#fe6-throbber > image, #fe6-throbber-img { width: 20px; height: 20px; list-style-image: url("icons/throbber.svg"); }
-#fe6-throbber[busy] > image, #fe6-throbber[busy] #fe6-throbber-img { list-style-image: url("icons/throbber-busy.svg"); }
+#fe6-throbber > image, #fe6-throbber-img { width: 22px; height: 22px; list-style-image: url("icons/logo.png"); }
+/* while a page loads the logo turns like IE's spinning globe */
+#fe6-throbber[busy] #fe6-throbber-img { animation: fe6-spin 1.1s linear infinite; }
+@keyframes fe6-spin { 0% { transform: scaleX(1); } 25% { transform: scaleX(.25); } 50% { transform: scaleX(-1); } 75% { transform: scaleX(.25); } 100% { transform: scaleX(1); } }
 
 /* ===================================================================== Standard Buttons + Address band
  * One Firefox toolbar (#nav-bar), wrapped onto two rows: buttons on top, Address + Go below,
@@ -406,46 +407,152 @@ body, #browser { background: var(--fe-face) !important; color: var(--fe-text) !i
 #urlbar {
   --urlbar-height: 22px !important;
   --urlbar-toolbar-height: 22px !important;
+  /* Firefox 150+ draws the field as a pill from these; make everything square */
+  --urlbar-border-radius: 0px !important;
+  --urlbarview-border-radius: 0px !important;
+  --urlbar-inner-border-radius: 0px !important;
+  --urlbar-background-border-radius: 0px !important;
+  --urlbar-background-overhang-open: 0px !important;
+  --urlbar-basic-component-size: 18px !important;
+  --urlbar-icon-border-radius: 0px !important;
+  --urlbar-icon-padding: 1px !important;
+  --toolbarbutton-border-radius: 0px !important;
+  --border-radius-small: 0px !important;
+  --border-radius-medium: 0px !important;
+  --border-radius-large: 0px !important;
+  --border-radius-xlarge: 0px !important;
+  --border-radius-circle: 0px !important;
   min-height: 22px !important;
   color: var(--fe-wintext) !important;
 }
-#urlbar-background {
+/* Firefox <=149 used ids for the parts of the field, 150+ uses classes; match both */
+#urlbar :is(#urlbar-background, .urlbar-background) {
   background: var(--fe-window) !important;
   border: 0 !important;
   border-radius: 0 !important;
   outline: none !important;
   box-shadow: var(--fe-sunken) !important;
+  inset: 0 !important;
 }
-#urlbar[focused] > #urlbar-background,
-#urlbar[open] > #urlbar-background { outline: none !important; box-shadow: var(--fe-sunken) !important; }
-#urlbar-input-container, .urlbar-input-container {
+#urlbar:is([focused], [open]) :is(#urlbar-background, .urlbar-background) {
+  outline: none !important; box-shadow: var(--fe-sunken) !important; border-radius: 0 !important;
+}
+#urlbar :is(#urlbar-input-container, .urlbar-input-container) {
   padding: 2px 3px !important;
   min-height: 22px !important; height: 22px !important;
-  border: 0 !important;
+  border: 0 !important; border-radius: 0 !important;
+  align-items: center !important;
+  gap: 2px !important;
 }
-#urlbar-input, .urlbar-input { font: var(--fe-font) !important; color: var(--fe-wintext) !important; }
-#urlbar-input::placeholder, .urlbar-input::placeholder { color: var(--fe-graytext) !important; opacity: 1 !important; }
+#urlbar :is(#urlbar-input, .urlbar-input) { font: var(--fe-font) !important; color: var(--fe-wintext) !important; }
+#urlbar :is(#urlbar-input, .urlbar-input)::placeholder { color: var(--fe-graytext) !important; opacity: 1 !important; }
 #urlbar ::selection { background: var(--fe-sel) !important; color: var(--fe-seltext) !important; }
-/* keep the drop-down from growing past the field (Firefox "breakout" effect) */
-#urlbar[breakout][breakout-extend] {
-  top: 0 !important; left: 0 !important; width: 100% !important;
-  margin: 0 !important; padding: 0 !important;
+/* Don't let the field grow when it opens (Firefox's "breakout" effect). Firefox positions
+   the open field itself (it becomes a floating layer), so only zero its growth margins. */
+#urlbar {
+  --urlbar-margin-inline: 0px !important;
+  --urlbar-container-padding: 0px !important;
+  --urlbar-padding-block: 0px !important;
 }
-#urlbar[breakout][breakout-extend] > .urlbar-input-container,
-#urlbar[breakout][breakout-extend] > #urlbar-input-container { height: 22px !important; padding: 2px 3px !important; }
-#urlbar[breakout][breakout-extend] > #urlbar-background { inset: 0 !important; animation: none !important; }
-#urlbar-search-mode-indicator, #urlbar-label-box, .urlbar-label-box { border-radius: 0 !important; }
+#urlbar:is([breakout][breakout-extend], [open]) > :is(#urlbar-input-container, .urlbar-input-container) {
+  height: 22px !important; padding: 2px 3px !important;
+}
+#urlbar:is([breakout][breakout-extend], [open]) > :is(#urlbar-background, .urlbar-background) { animation: none !important; }
+#urlbar-search-mode-indicator, #urlbar-label-box, .urlbar-label-box, .urlbar-search-mode-indicator { border-radius: 0 !important; }
 #identity-box, #tracking-protection-icon-container, .urlbar-page-action, #star-button-box, #page-action-buttons > *,
-#identity-icon-box, #identity-permission-box {
+#identity-icon-box, #identity-permission-box, #trust-icon-container, .identity-box-button {
   border-radius: 0 !important;
   padding-block: 0 !important;
   margin-block: 0 !important;
 }
-#identity-box, #identity-icon-box { background: transparent !important; }
-#urlbar .urlbar-icon, #identity-icon, #permissions-granted-icon, #tracking-protection-icon {
+#identity-box, #identity-icon-box, #trust-icon-container { background: transparent !important; }
+:is(#identity-icon-box, .identity-box-button, #trust-icon-container, .urlbar-page-action, #tracking-protection-icon-container):hover {
+  background: transparent !important; box-shadow: var(--fe-thin-raised) !important;
+}
+#urlbar .urlbar-icon, #identity-icon, #trust-icon, #permissions-granted-icon, #tracking-protection-icon {
   fill: var(--fe-wintext) !important;
 }
-#urlbar-go-button { display: none !important; }   /* the IE "Go" button sits outside the field instead */
+#urlbar :is(#urlbar-go-button, .urlbar-go-button) { display: none !important; }   /* the IE "Go" button sits outside the field */
+
+/* search-engine picker (the "G ▾" button at the left of the field): a flat Win98 drop-down
+   button — flat until hovered, raised on hover, pushed in while its menu is open */
+#urlbar :is(#urlbar-searchmode-switcher, .searchmode-switcher) {
+  --button-border-radius: 0px !important;
+  --button-background-color: transparent !important;
+  --button-background-color-hover: transparent !important;
+  --button-background-color-active: transparent !important;
+  --button-border-color: transparent !important;
+  --button-border-color-hover: transparent !important;
+  --button-border-color-active: transparent !important;
+  --button-padding: 0 2px !important;
+  --button-min-height: 18px !important;
+  --button-text-color: var(--fe-wintext) !important;
+  --focus-outline: 1px dotted var(--fe-wintext) !important;
+  appearance: none !important;
+  height: 18px !important;
+  min-height: 18px !important;
+  margin: 0 2px 0 0 !important;
+  padding: 0 2px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  align-self: center !important;
+}
+#urlbar .searchmode-switcher::part(button) {
+  border-radius: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  min-height: 18px !important;
+  height: 18px !important;
+  padding: 0 2px !important;
+}
+#urlbar #urlbar-searchmode-switcher:hover,
+#urlbar .searchmode-switcher:hover::part(button) { box-shadow: var(--fe-thin-raised) !important; }
+#urlbar #urlbar-searchmode-switcher:is([open], :hover:active),
+#urlbar .searchmode-switcher:is([open], [aria-expanded="true"], :hover:active)::part(button) { box-shadow: var(--fe-thin-sunken) !important; }
+#urlbar :is(#searchmode-switcher-icon, .searchmode-switcher-icon) { width: 16px !important; height: 16px !important; border-radius: 0 !important; }
+#urlbar :is(#searchmode-switcher-dropmarker, .searchmode-switcher-dropmarker) {
+  content: url("icons/alltabs.svg") !important;
+  list-style-image: url("icons/alltabs.svg") !important;
+  -moz-context-properties: fill !important;
+  fill: var(--fe-wintext) !important;
+  width: 9px !important; height: 16px !important;
+  margin-inline: 0 !important;
+  object-fit: none !important;
+  transform: none !important;     /* IE never flipped the arrow while the list is open */
+  rotate: none !important;
+}
+#urlbar :is(#searchmode-switcher-title, .searchmode-switcher-title) {
+  font: var(--fe-font) !important; color: var(--fe-wintext) !important; margin: 0 !important;
+}
+/* when a search engine is active Firefox shows a chip with a close button: square it too */
+#urlbar :is(.searchmode-switcher-close, #searchmode-switcher-close) {
+  border-radius: 0 !important; width: 14px !important; height: 14px !important; padding: 2px !important;
+}
+.searchmode-switcher-panel, #searchmode-switcher-popup {
+  --panel-border-radius: 0px !important;
+  --panel-padding: 2px !important;
+}
+.searchmode-switcher-panel-list, panel-list {
+  --panel-list-border-radius: 0px !important;
+  border-radius: 0 !important;
+  background: var(--fe-face) !important;
+  color: var(--fe-text) !important;
+  box-shadow: var(--fe-raised) !important;
+  border: 0 !important;
+  padding: 3px !important;
+  font: var(--fe-font) !important;
+}
+panel-item::part(button), .searchmode-switcher-panel-list panel-item {
+  border-radius: 0 !important;
+  font: var(--fe-font) !important;
+}
+panel-item:is(:hover, :focus-visible, [_moz-menuactive])::part(button) {
+  background: var(--fe-sel) !important; color: var(--fe-seltext) !important;
+}
+#searchmode-switcher-popup menuitem[_moz-menuactive] { background: var(--fe-sel) !important; color: var(--fe-seltext) !important; }
 
 /* results drop-down: plain white list with navy selection */
 .urlbarView {
@@ -557,6 +664,9 @@ body, #browser { background: var(--fe-face) !important; color: var(--fe-text) !i
 }
 #TabsToolbar toolbarbutton.toolbarbutton-1:hover:active > .toolbarbutton-icon { box-shadow: var(--fe-pressed) !important; }
 #tabs-newtab-button, #new-tab-button, #tabbrowser-tabs .tabs-newtab-button { list-style-image: url("icons/newtab.svg") !important; }
+#alltabs-button { list-style-image: url("icons/alltabs.svg") !important; }
+#alltabs-button > .toolbarbutton-badge-stack > .toolbarbutton-icon,
+#alltabs-button > .toolbarbutton-icon { -moz-context-properties: fill !important; fill: var(--fe-text) !important; }
 #tabbrowser-tabs .tabs-newtab-button > .toolbarbutton-icon { -moz-context-properties: none !important; }
 .tab-drop-indicator { filter: grayscale(1); }
 #tabbrowser-tabs[haspinnedtabs]:not([positionpinnedtabs]) > #tabbrowser-arrowscrollbox > .tabbrowser-tab:nth-child(1 of :not([pinned], [hidden])) { margin-inline-start: 4px !important; }
