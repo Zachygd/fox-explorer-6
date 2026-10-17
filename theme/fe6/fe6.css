@@ -128,7 +128,7 @@ body, #browser { background: var(--fe-face) !important; color: var(--fe-text) !i
   height: 18px;
   margin: 3px 3px 1px;
   padding: 0 2px 0 2px;
-  background: linear-gradient(to right, var(--fe-cap1), var(--fe-cap2));
+  background: var(--fe-cap-grad);
   color: var(--fe-captext);
   -moz-window-dragging: drag;
 }
@@ -257,12 +257,12 @@ body, #browser { background: var(--fe-face) !important; color: var(--fe-text) !i
 }
 #nav-bar .toolbarbutton-1 > .toolbarbutton-icon,
 #nav-bar .toolbarbutton-1 > .toolbarbutton-badge-stack {
-  width: 28px !important; height: 28px !important;
+  width: 30px !important; height: 30px !important;   /* SE98 toolbar icons are 22x22 */
   padding: 4px !important;
   min-width: 0 !important;
 }
 #nav-bar .toolbarbutton-1 > .toolbarbutton-badge-stack > .toolbarbutton-icon {
-  width: 20px !important; height: 20px !important; padding: 0 !important; background: none !important;
+  width: 22px !important; height: 22px !important; padding: 0 !important; background: none !important;
 }
 #nav-bar .toolbarbutton-1 .toolbarbutton-icon { filter: var(--fe-cold-filter); }       /* IE5/6: gray until hovered */
 #nav-bar .toolbarbutton-1:not([disabled]):is(:hover, [open], [checked]) .toolbarbutton-icon { filter: none; }
@@ -928,10 +928,78 @@ sidebar-main, #sidebar-main {
 #downloads-indicator-icon {
   list-style-image: url("icons/downloads.svg") !important;
   -moz-context-properties: none !important;
-  width: 20px !important; height: 20px !important;
+  width: 22px !important; height: 22px !important;
 }
 #nav-bar #downloads-indicator-icon { filter: var(--fe-cold-filter); }
 #nav-bar #downloads-button:not([disabled]):is(:hover, [open]) #downloads-indicator-icon { filter: none; }
+
+/* Firefox's modern download animations (arrow drop, finish burst, progress ring) don't fit a
+   98 toolbar, so they're switched off. While something downloads, the button plays a Windows 98
+   style animation instead: a page flies from the globe into the folder (se98/downloading.png),
+   with a small segmented progress bar underneath. */
+#downloads-button > .toolbarbutton-badge-stack > :is(#downloads-indicator-start-box, #downloads-indicator-finish-box) { display: none !important; }
+#downloads-button > .toolbarbutton-badge-stack > #downloads-indicator-anchor { width: 22px !important; height: 22px !important; }
+#downloads-button > .toolbarbutton-badge-stack > #downloads-indicator-anchor > #downloads-indicator-icon { visibility: visible !important; }
+#downloads-button[progress] > .toolbarbutton-badge-stack > #downloads-indicator-anchor > #downloads-indicator-icon {
+  visibility: hidden !important;
+}
+#downloads-button[progress] > .toolbarbutton-badge-stack > #downloads-indicator-anchor {
+  /* 9 frames of 22px; background-position is left to the animation (!important would freeze it) */
+  background-image: url("se98/downloading.png") !important;
+  background-size: 198px 22px !important;
+  background-repeat: no-repeat !important;
+  background-position: 0 0;
+  animation: fe6-downloading 1.35s steps(9) infinite !important;
+}
+@keyframes fe6-downloading {
+  from { background-position: 0 0; }
+  to { background-position: -198px 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #downloads-button[progress] > .toolbarbutton-badge-stack > #downloads-indicator-anchor { animation: none !important; background-position: -66px 0 !important; }
+}
+#downloads-button > .toolbarbutton-badge-stack > #downloads-indicator-progress-outer {
+  background: var(--fe-window) !important;
+  box-shadow: var(--fe-thin-sunken) !important;
+  border-radius: 0 !important;
+  /* Firefox centres this box as a 20px ring; make it a 22x5 bar along the bottom of the icon */
+  top: auto !important; left: auto !important;
+  align-self: end !important; justify-self: center !important;
+  justify-content: start !important; align-items: center !important;
+  width: 22px !important; height: 5px !important;
+  margin: 0 0 -4px !important;
+  padding: 1px !important;
+  box-sizing: border-box !important;
+}
+#downloads-button > .toolbarbutton-badge-stack > #downloads-indicator-progress-outer > #downloads-indicator-progress-inner {
+  width: var(--download-progress-pcent) !important;
+  height: 3px !important;
+  border-radius: 0 !important;
+  background: repeating-linear-gradient(to right, var(--fe-progress) 0 3px, transparent 3px 4px) !important;
+}
+#downloads-button[progress]:not([notification]) > .toolbarbutton-badge-stack > #downloads-indicator-progress-outer,
+#downloads-button[progress] > .toolbarbutton-badge-stack > #downloads-indicator-progress-outer { visibility: visible !important; }
+/* in colour while it works, like a hot-tracked button */
+#nav-bar #downloads-button[progress] #downloads-indicator-icon,
+#nav-bar #downloads-button[progress] #downloads-indicator-anchor { filter: none !important; }
+
+/* the downloads panel (and Library > Downloads) progress bars: Windows 98 sunken bar with blocks */
+:is(#downloadsPanel, #downloadsListBox, #downloadsRichListBox) progress,
+.downloadProgress {
+  appearance: none !important;
+  -moz-default-appearance: none !important;
+  height: 12px !important; min-height: 12px !important;
+  border: 0 !important; border-radius: 0 !important;
+  padding: 2px !important; box-sizing: border-box !important;
+  background: var(--fe-window) !important;
+  box-shadow: var(--fe-thin-sunken) !important;
+}
+:is(#downloadsPanel, #downloadsListBox, #downloadsRichListBox) progress::-moz-progress-bar,
+.downloadProgress::-moz-progress-bar {
+  appearance: none !important;
+  border-radius: 0 !important;
+  background: repeating-linear-gradient(to right, var(--fe-progress) 0 6px, transparent 6px 8px) !important;
+}
 
 /* Firefox hides a spacer letter ("a") with font-size: 0. The Win98 font rule above
    (#navigator-toolbox *) is more specific, so match it with an ID too or the letter shows
@@ -947,3 +1015,27 @@ sidebar-main, #sidebar-main {
 #fxa-toolbar-menu-button > .toolbarbutton-badge-stack { display: flex !important; }
 
 #fe6-search-popup menuitem[fe6-bold] :is(.menu-text, .menu-iconic-text, label) { font-weight: bold !important; }
+
+/* ===================================================================== Cathode accents
+   Only with a Cathode theme (View › Theme). The gray of the toolbars stays the same as the
+   Cathode taskbar; the theme's colours go into the details, the way Cathode does on the desktop. */
+/* the selected tab gets a strip of the title-bar gradient along its top edge */
+:root[fe6-theme] .tabbrowser-tab[visuallyselected] .tab-background {
+  background: var(--fe-cap-grad) 2px 1px / calc(100% - 4px) 3px no-repeat, var(--fe-face) !important;
+}
+:root[fe6-theme] .tabbrowser-tab:not([visuallyselected]):hover .tab-label { color: var(--fe-accent-text) !important; }
+/* hot-tracked toolbar buttons and links light up in the theme colour */
+:root[fe6-theme] #nav-bar .toolbarbutton-1:not([disabled]):is(:hover, [open]) .toolbarbutton-text,
+:root[fe6-theme] #PersonalToolbar toolbarbutton:not([disabled]):hover .toolbarbutton-text,
+:root[fe6-theme] #fe6-go-button:hover .toolbarbutton-text { color: var(--fe-accent-text) !important; }
+/* the menu bar's open menu and the Explorer bar (sidebar) title use the theme colour */
+:root[fe6-theme] #main-menubar > menu[open] { background: var(--fe-accent) !important; color: #ffffff !important; box-shadow: none !important; }
+:root[fe6-theme] #sidebar-header {
+  background: var(--fe-cap-grad) left bottom / 100% 2px no-repeat, var(--fe-face) !important;
+  padding-bottom: 4px !important;
+}
+/* the Address bar shows a theme-coloured edge while you type in it */
+:root[fe6-theme] #urlbar[focused] :is(#urlbar-background, .urlbar-background) { box-shadow: var(--fe-sunken), inset 0 0 0 3px var(--fe-accent) !important; }
+/* a thin rule of the title-bar gradient under the menu bar, like Cathode's Start menu banner */
+:root[fe6-theme] #toolbar-menubar { border-bottom: 2px solid transparent !important; border-image: var(--fe-cap-grad) 1 !important; }
+:root[fe6-theme] #toolbar-menubar[autohide="true"][inactive] { border-bottom: 0 !important; }

@@ -2,7 +2,7 @@
 
 **Firefox, dressed as Internet Explorer 6 on Windows 98** — for Fedora Linux 44 and other Linux systems.
 
-![Fox Explorer 6 in the classic light scheme](docs/screenshots/light-website.png)
+![Fox Explorer 6 in the Windows Standard theme](docs/screenshots/light-start.png)
 
 Fox Explorer 6 is built from Mozilla's Firefox source ([mozilla-firefox/firefox](https://github.com/mozilla-firefox/firefox)).
 It's still a current Firefox underneath, so tabs, Firefox extensions, Sync, private windows and
@@ -23,17 +23,35 @@ every modern setting work as normal. Only the look changes:
 - **Classic menus:** grey menus with navy highlight, etched separators, checkmarks and radio dots,
   and yellow tooltips. The menus are relabelled to **Favorites** ("Add to Favorites…", "Organize
   Favorites…") and **Tools › Internet Options…**, which opens Firefox's full settings.
+- **Icons:** the toolbar, menus, sidebar, Library and status bar use the **SE98** icon set by
+  [nestoris](https://github.com/nestoris/Win98SE) (GPL-2.0), a faithful Windows 98 SE style set.
+- **Themes:** **Windows Standard** (classic Windows 98), plus every **Cathode** colour theme from
+  the [Cathode KDE theme](https://github.com/Zachygd/Cathode-KDE-Theme): Cathode, Brick, Pumpkin,
+  Wheat, Ember, Spruce, Meadow, Marine, Teal, Plum, Eggplant, Rose, Storm, Slate, Spectrum and
+  Sunset. The Cathode themes use the same grays as the Cathode taskbar and windows, and add the
+  theme's colour as accents: the title bar, a stripe on the selected tab, the open menu,
+  selections, hot-tracked buttons, links, progress bars and the sidebar header.
+- **Downloads:** while a file downloads, the Downloads button plays a Windows 98 style animation
+  (a page flying from the globe into the folder) with a small block progress bar under it.
 - **Light mode:** the Windows 98 "Windows Standard" colour scheme.
 - **Dark mode:** the same scheme with every colour's lightness flipped. The 3D lighting stays
   top-left, so buttons still look raised. Websites that support dark mode follow it.
 - **Use System Setting:** follows GNOME/KDE light or dark automatically.
 
-| Dark mode | Settings page |
+| Cathode | Cathode Teal, dark |
 |---|---|
-| ![dark](docs/screenshots/dark-start.png) | ![settings](docs/screenshots/settings.png) |
+| ![Cathode theme](docs/screenshots/cathode-light.png) | ![Cathode Teal in dark mode](docs/screenshots/cathode-teal-dark.png) |
+| **Cathode Spruce** | **Windows Standard, dark** |
+| ![Cathode Spruce theme](docs/screenshots/cathode-spruce-light.png) | ![Windows Standard in dark mode](docs/screenshots/dark-start.png) |
 
-Switch schemes from **View › Color Scheme**, or in **Tools › Internet Options** (the
-*Fox Explorer 6* section at the top of General).
+Pick a theme from **View › Theme**, and light or dark from **View › Color Scheme**. Both are
+also in **Tools › Internet Options** (the *Fox Explorer 6* section at the top of General). Every
+theme works in light and dark. Fox Explorer doesn't follow your KDE colour scheme by itself:
+choose the matching theme once and it stays.
+
+| View › Theme | Internet Options |
+|---|---|
+| ![Theme menu](docs/screenshots/theme-menu.png) | ![Settings](docs/screenshots/settings.png) |
 
 ---
 
@@ -52,36 +70,7 @@ sudo dnf install dist/foxexplorer6-*.x86_64.rpm      # or .aarch64.rpm on ARM
 Then open **Fox Explorer 6** from your app grid, or run `foxexplorer6`.
 
 Options: `--channel esr` (Firefox ESR instead of release), `--version 158.0.1`, `--lang de`,
-`--from firefox-158.0.1.tar.xz` (use a tarball you already downloaded),
-`--ie6-icons ~/IE6.iso` (use the real IE6 icons — see below).
-
-### The original IE6 icons (optional)
-
-Fox Explorer ships with its own Win98-style icons. If you have an Internet Explorer 6 setup CD
-image, the build uses the **real IE6 icons** from it instead: the toolbar buttons (grey until you
-point at them, then colour), Go, Downloads, the Edit/Explorer tools in Customize, the Favorites and
-History sidebar icons, the padlock and the Internet-zone globe.
-
-This happens **automatically** when an IE6 CD image is in `~/Downloads`, your home folder or the
-project folder (named like `IE6.iso`) and `cabextract` is installed:
-
-```bash
-sudo dnf install cabextract
-scripts/build-repack.sh --rpm                      # finds ~/Downloads/IE6.iso by itself
-scripts/build-repack.sh --rpm --ie6-icons /path/to/IE6.iso
-scripts/build-repack.sh --rpm --no-ie6-icons       # always use Fox Explorer's own icons
-```
-
-Or add them to a copy that's already installed, without rebuilding:
-
-```bash
-sudo python3 scripts/import-ie6-icons.py ~/Downloads/IE6.iso /usr/lib64/foxexplorer6/foxexplorer/ie6
-```
-
-The icons are Microsoft's artwork, so they're converted on your machine from media you own and are
-never stored in this repository (`theme/fe6/ie6/` is git-ignored). That keeps the repository safe to
-publish on GitHub; just don't publish *packages* built with them. Builds without an IE6 image use
-Fox Explorer's own icon set for everything.
+`--from firefox-158.0.1.tar.xz` (use a tarball you already downloaded).
 
 ### Other distributions
 
@@ -134,7 +123,8 @@ and 1–3 hours.
 | [`branding/foxexplorer/`](branding/foxexplorer) | Names, icons and About-box art. Source builds use it via `--with-branding`; the quick build patches it into `omni.ja` ([`scripts/rebrand-omni.py`](scripts/rebrand-omni.py)). |
 | [`scripts/make-appini.py`](scripts/make-appini.py) | Gives Fox Explorer its own profile (`~/.mozilla/foxexplorer6`) and window class, so it sits beside a normal Firefox without sharing anything. Internally the app is still named *Firefox*, so websites and addons.mozilla.org treat it as Firefox. |
 | [`art/`](art) | The app logo and the scripts that generate the icon set and branding sizes. |
-| [`scripts/import-ie6-icons.py`](scripts/import-ie6-icons.py) | Optional: converts the original IE6 icons from your own IE6 CD image into the build. |
+| [`theme/fe6/se98/`](theme/fe6/se98) | The SE98 icons by nestoris (GPL-2.0) and `se98.css`, which puts them on Firefox's buttons. Made by [`art/make_se98.py`](art/make_se98.py) from a clone of [Win98SE](https://github.com/nestoris/Win98SE); the Downloads animation by [`art/make_download_anim.py`](art/make_download_anim.py). |
+| [`theme/fe6/fe6-themes.css`](theme/fe6/fe6-themes.css) | The Cathode themes, light and dark. Made by [`art/make_themes.py`](art/make_themes.py) from the Cathode KDE theme's colour table (`build/schemes.py`), so a new Cathode scheme is one re-run away. |
 
 ### Settings
 
@@ -143,6 +133,7 @@ All of these are in **about:config**, and most are also in **Tools › Internet 
 | Pref | Default | |
 |---|---|---|
 | `foxexplorer.colorScheme` | `light` | `light`, `dark` or `system` |
+| `foxexplorer.theme` | `classic` | `classic` (Windows Standard) or a Cathode theme: `cathode`, `brick`, `pumpkin`, `wheat`, `ember`, `spruce`, `meadow`, `marine`, `teal`, `plum`, `eggplant`, `rose`, `storm`, `slate`, `spectrum`, `sunset` |
 | `foxexplorer.classicTitlebar` | `true` | Win98 caption bar; `false` hands the title bar back to your desktop |
 | `foxexplorer.statusBar` | `true` | also **View › Status Bar** |
 | `foxexplorer.showHistoryMenu` | `false` | IE6 had no History menu; turn Firefox's back on |
@@ -153,11 +144,13 @@ Your own `userChrome.css` still works on top (`toolkit.legacyUserProfileCustomiz
 
 ### Good to know
 
-- **Artwork:** the default toolbar icons were drawn for this project in a Win98-style 16-colour
-  palette. The app logo is in [`art/foxexplorer-logo.png`](art/foxexplorer-logo.png); run
-  `art/make_branding.sh` after replacing it to regenerate every icon size. The logo combines
-  elements of the Firefox and Internet Explorer logos, which are trademarks of Mozilla and
-  Microsoft, so it's fine for personal use but worth replacing before publishing builds.
+- **Artwork:** the icons are SE98 by nestoris (see above). A few small pieces SE98 doesn't cover
+  (the title-bar buttons, menu checkmarks, the toolbar chevron) were drawn for this project in a
+  Win98-style 16-colour palette. The app logo is in
+  [`art/foxexplorer-logo.png`](art/foxexplorer-logo.png); run `art/make_branding.sh` after
+  replacing it to regenerate every icon size. The logo combines elements of the Firefox and
+  Internet Explorer logos, which are trademarks of Mozilla and Microsoft, so it's fine for
+  personal use but worth replacing before publishing builds.
 - **Fonts:** the UI asks for *MS Sans Serif / Tahoma* and falls back to Liberation Sans or Arial. For
   the most authentic text, install a Tahoma-compatible font, for example from Wine:
   `sudo dnf install wine-tahoma-fonts-system` (the `-system` package makes it available to all apps).
@@ -169,4 +162,6 @@ Your own `userChrome.css` still works on top (`toolkit.legacyUserProfileCustomiz
   branding don't send telemetry.
 - Fox Explorer 6 is an unofficial project, not affiliated with Mozilla or Microsoft. Firefox is a
   trademark of the Mozilla Foundation, and Internet Explorer and Windows are trademarks of
-  Microsoft. Released under the **MPL-2.0** ([LICENSE](LICENSE)), like Firefox.
+  Microsoft. Released under the **MPL-2.0** ([LICENSE](LICENSE)), like Firefox. The SE98 icons in
+  [`theme/fe6/se98/`](theme/fe6/se98) are by nestoris and stay under their own licence, the
+  **GPL-2.0** ([theme/fe6/se98/LICENSE](theme/fe6/se98/LICENSE)).

@@ -15,7 +15,7 @@ Name:           foxexplorer6
 Version:        %{fe_version}
 Release:        %{?fe_release}%{!?fe_release:1}%{?dist}
 Summary:        Firefox with the classic Internet Explorer 6 / Windows 98 look
-License:        MPL-2.0
+License:        MPL-2.0 AND GPL-2.0-only
 URL:            https://github.com/mozilla-firefox/firefox
 Source0:        %{fe_tarball}
 ExclusiveArch:  x86_64 aarch64
@@ -59,6 +59,7 @@ gtk-update-icon-cache -q %{_datadir}/icons/hicolor &>/dev/null || :
 
 %files
 %license foxexplorer/LICENSE
+# the SE98 icons (GPL-2.0) keep their licence next to them, in foxexplorer/se98/LICENSE
 %{appdir}
 %{_bindir}/foxexplorer6
 %{_datadir}/applications/foxexplorer6.desktop

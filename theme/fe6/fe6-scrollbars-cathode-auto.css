@@ -1,0 +1,8 @@
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+/* Fox Explorer 6 — Cathode themes: follow the desktop (registered for "Use System Setting") */
+@media (prefers-color-scheme: dark) {
+scrollbar, scrollcorner {
+    --fe-sb-face: #3a3a3a !important; --fe-sb-hi: #686868 !important; --fe-sb-light: #4a4a4a !important; --fe-sb-shadow: #242424 !important; --fe-sb-dark: #000000 !important;
+    --fe-sb-track: #3a3a3a !important; --fe-sb-dot: #242424 !important; --fe-sb-arrow: #e8e8e8 !important;
+}
+}

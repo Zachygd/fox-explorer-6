@@ -2,7 +2,6 @@
 # Fox Explorer 6 — full build from Mozilla's Firefox source on GitHub.
 #
 #   scripts/build-from-source.sh [--branch release|beta|esr153|main] [--rpm] [--jobs N]
-#                                [--ie6-icons /path/to/IE6.iso]
 #
 # Clones https://github.com/mozilla-firefox/firefox (shallow), adds the Fox Explorer 6
 # branding as browser/branding/foxexplorer, compiles with packaging/mozconfig, then adds the
@@ -13,15 +12,13 @@
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REPO="https://github.com/mozilla-firefox/firefox.git"
-BRANCH=release; RPM=0; JOBS=""; IE6_MEDIA=""
+BRANCH=release; RPM=0; JOBS=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --branch) BRANCH="$2"; shift 2;;
     --rpm) RPM=1; shift;;
     --jobs) JOBS="$2"; shift 2;;
-    --ie6-icons) IE6_MEDIA="$2"; shift 2;;
-    --no-ie6-icons) IE6_MEDIA="none"; shift;;
-    -h|--help) sed -n 2,13p "$0"; exit 0;;
+    -h|--help) sed -n 2,11p "$0"; exit 0;;
     *) echo "unknown option: $1" >&2; exit 2;;
   esac
 done
@@ -67,11 +64,6 @@ tar -C "$WORK" -xf "$PKG"
 APP="$WORK/foxexplorer6"
 echo "==> installing the IE6 chrome layer"
 "$HERE/scripts/apply-layer.sh" "$APP"
-IE6_MEDIA="$("$HERE/scripts/find-ie6-media.sh" "$IE6_MEDIA")"
-if [ -n "$IE6_MEDIA" ]; then
-  echo "==> importing IE6 icons from $IE6_MEDIA"
-  python3 "$HERE/scripts/import-ie6-icons.py" "$IE6_MEDIA" "$APP/foxexplorer/ie6"
-fi
 TARBALL_OUT="$("$HERE/scripts/package.sh" "$APP" "$VERSION" "$ARCH" "$HERE/dist")"
 echo "    $TARBALL_OUT"
 if [ "$RPM" = 1 ]; then "$HERE/scripts/build-rpm.sh" "$TARBALL_OUT" "$VERSION"; fi

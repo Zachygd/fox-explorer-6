@@ -1,0 +1,4 @@
+/* Fox Explorer 6 — dark tooltips for Windows Standard when the scheme follows the system; see fe6-agent-dark.css */
+@media (prefers-color-scheme: dark) {
+  tooltip:not(#fe6-none) { background: #1e1e00 !important; color: #ffffff !important; border-color: #000 !important; }
+}

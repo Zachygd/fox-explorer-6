@@ -276,7 +276,7 @@ treechildren::-moz-tree-row { border-radius: 0 !important; min-height: 18px !imp
 }
 .dialogOverlay[topmost="true"] { background-color: rgba(0, 0, 0, .15) !important; }
 .dialogTitleBar {
-  background: linear-gradient(to right, var(--fe-cap1), var(--fe-cap2)) !important;
+  background: var(--fe-cap-grad) !important;
   color: var(--fe-captext) !important;
   border: 0 !important; border-radius: 0 !important;
   padding: 2px 4px !important; margin: 0 0 2px !important;

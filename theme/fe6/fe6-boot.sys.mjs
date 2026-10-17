@@ -23,23 +23,161 @@ const CHROME_DOC_PREFIXES = [
   "chrome://browser/content/aboutDialog",
   "chrome://global/content/print.html",
 ];
-// Optional: original IE6 icons converted from the user's own IE6 CD by scripts/import-ie6-icons.py
-const IE6_CSS_URI = "resource://fe6/ie6/ie6.css";
-let ie6IconsPresent = null;
-function hasIE6Icons() {
-  if (ie6IconsPresent === null) {
-    try {
-      const res = Services.io.getProtocolHandler("resource").QueryInterface(Ci.nsIResProtocolHandler);
-      const spec = res.resolveURI(Services.io.newURI(IE6_CSS_URI));
-      ie6IconsPresent = Services.io.newURI(spec).QueryInterface(Ci.nsIFileURL).file.exists();
-    } catch (e) {
-      ie6IconsPresent = false;
-    }
-  }
-  return ie6IconsPresent;
-}
+// SE98 icons by nestoris (GPL-2.0), generated into se98/ by art/make_se98.py
+const SE98_CSS_URI = "resource://fe6/se98/se98.css";
+// Cathode colour themes (art/make_themes.py, from the Cathode KDE theme)
+const THEMES_CSS_URI = "resource://fe6/fe6-themes.css";
+// GENERATED THEMES (art/make_themes.py) - don't edit by hand
+const THEMES = [
+ {
+  "id": "cathode",
+  "name": "Cathode",
+  "grad": "linear-gradient(to right, #01118d 0%, #064ed8 45%, #28aff3 100%)",
+  "deskLight": "#008080",
+  "deskDark": "#004848",
+  "linkLight": "#064ed8",
+  "linkDark": "#28aff3"
+ },
+ {
+  "id": "brick",
+  "name": "Brick",
+  "grad": "linear-gradient(to right, #6b0404 0%, #cc1010 45%, #fa5e46 100%)",
+  "deskLight": "#803030",
+  "deskDark": "#421919",
+  "linkLight": "#cc1010",
+  "linkDark": "#fa5e46"
+ },
+ {
+  "id": "pumpkin",
+  "name": "Pumpkin",
+  "grad": "linear-gradient(to right, #6b3104 0%, #cc6210 45%, #faac46 100%)",
+  "deskLight": "#805330",
+  "deskDark": "#422b19",
+  "linkLight": "#b2550e",
+  "linkDark": "#faac46"
+ },
+ {
+  "id": "wheat",
+  "name": "Wheat",
+  "grad": "linear-gradient(to right, #6b5304 0%, #cca010 45%, #fae846 100%)",
+  "deskLight": "#806d30",
+  "deskDark": "#423919",
+  "linkLight": "#876a0a",
+  "linkDark": "#fae846"
+ },
+ {
+  "id": "ember",
+  "name": "Ember",
+  "grad": "linear-gradient(to right, #6b1904 0%, #cc3610 45%, #fa8246 100%)",
+  "deskLight": "#804030",
+  "deskDark": "#422119",
+  "linkLight": "#cc3610",
+  "linkDark": "#fa8246"
+ },
+ {
+  "id": "spruce",
+  "name": "Spruce",
+  "grad": "linear-gradient(to right, #046b27 0%, #10cc4f 45%, #46fa9a 100%)",
+  "deskLight": "#30804b",
+  "deskDark": "#194227",
+  "linkLight": "#0a7f31",
+  "linkDark": "#46fa9a"
+ },
+ {
+  "id": "meadow",
+  "name": "Meadow",
+  "grad": "linear-gradient(to right, #3b6b04 0%, #74cc10 45%, #8efa46 100%)",
+  "deskLight": "#5b8030",
+  "deskDark": "#2f4219",
+  "linkLight": "#457b09",
+  "linkDark": "#8efa46"
+ },
+ {
+  "id": "marine",
+  "name": "Marine",
+  "grad": "linear-gradient(to right, #046b49 0%, #10cc8d 45%, #46fad6 100%)",
+  "deskLight": "#308065",
+  "deskDark": "#194235",
+  "linkLight": "#0a7f58",
+  "linkDark": "#46fad6"
+ },
+ {
+  "id": "teal",
+  "name": "Teal",
+  "grad": "linear-gradient(to right, #04616b 0%, #10b9cc 45%, #46d0fa 100%)",
+  "deskLight": "#307880",
+  "deskDark": "#193e42",
+  "linkLight": "#0a7a87",
+  "linkDark": "#46d0fa"
+ },
+ {
+  "id": "plum",
+  "name": "Plum",
+  "grad": "linear-gradient(to right, #5a046b 0%, #ad10cc 45%, #f446fa 100%)",
+  "deskLight": "#723080",
+  "deskDark": "#3b1942",
+  "linkLight": "#ad10cc",
+  "linkDark": "#f446fa"
+ },
+ {
+  "id": "eggplant",
+  "name": "Eggplant",
+  "grad": "linear-gradient(to right, #2d046b 0%, #5b10cc 45%, #a646fa 100%)",
+  "deskLight": "#503080",
+  "deskDark": "#2a1942",
+  "linkLight": "#5b10cc",
+  "linkDark": "#ba6bff"
+ },
+ {
+  "id": "rose",
+  "name": "Rose",
+  "grad": "linear-gradient(to right, #6b043f 0%, #cc107b 45%, #fa4694 100%)",
+  "deskLight": "#80305d",
+  "deskDark": "#421930",
+  "linkLight": "#cc107b",
+  "linkDark": "#ff4797"
+ },
+ {
+  "id": "storm",
+  "name": "Storm",
+  "grad": "linear-gradient(to right, #040b6b 0%, #101dcc 45%, #5246fa 100%)",
+  "deskLight": "#303680",
+  "deskDark": "#191c42",
+  "linkLight": "#101dcc",
+  "linkDark": "#8d85ff"
+ },
+ {
+  "id": "slate",
+  "name": "Slate",
+  "grad": "linear-gradient(to right, #323538 0%, #676d73 45%, #bbc1c7 100%)",
+  "deskLight": "#697480",
+  "deskDark": "#2a2e33",
+  "linkLight": "#5e656b",
+  "linkDark": "#bbc1c7"
+ },
+ {
+  "id": "spectrum",
+  "name": "Spectrum",
+  "grad": "linear-gradient(to right, #b40a14 0%, #d2640a 22%, #b49600 42%, #1e9628 60%, #1450c8 80%, #7a32d2 100%)",
+  "deskLight": "#2e5478",
+  "deskDark": "#12243a",
+  "linkLight": "#1450c8",
+  "linkDark": "#b070ff"
+ },
+ {
+  "id": "sunset",
+  "name": "Sunset",
+  "grad": "linear-gradient(to right, #4a0a3e 0%, #c0144e 40%, #e8501e 75%, #ffa03c 100%)",
+  "deskLight": "#7a3a4c",
+  "deskDark": "#2e141c",
+  "linkLight": "#c0144e",
+  "linkDark": "#ffa03c"
+ }
+];
+// END GENERATED THEMES
 const PREF = {
   scheme: "foxexplorer.colorScheme",       // "light" | "dark" | "system"
+  theme: "foxexplorer.theme",              // "classic" (Windows Standard) or a Cathode theme id
   statusbar: "foxexplorer.statusBar",      // bool
   caption: "foxexplorer.classicTitlebar",  // bool: draw the Win98 title bar
   historyMenu: "foxexplorer.showHistoryMenu",
@@ -135,6 +273,45 @@ function applyGlobalScheme() {
 
 function setScheme(value) {
   Services.prefs.setStringPref(PREF.scheme, value);
+}
+
+function currentTheme() {
+  const t = getPref(PREF.theme, "classic");
+  return THEMES.some(x => x.id === t) ? t : "classic";
+}
+
+function themeLabel(t) {
+  return t.id === "cathode" ? "Cathode" : "Cathode " + t.name;
+}
+
+function setTheme(value) {
+  Services.prefs.setStringPref(PREF.theme, value);
+}
+
+/* Put the theme on a document: <html fe6-theme="teal"> selects its palette in fe6-themes.css
+   and turns on the Cathode accents in fe6.css. Windows Standard has no attribute. */
+function applyThemeAttr(doc) {
+  const root = doc?.documentElement;
+  if (!root) return;
+  const t = currentTheme();
+  if (t === "classic") root.removeAttribute("fe6-theme");
+  else root.setAttribute("fe6-theme", t);
+}
+
+/* every themed document: browser windows, their sidebars, the Library and dialogs */
+function applyThemeEverywhere() {
+  for (const w of Services.wm.getEnumerator(null)) {
+    try {
+      const doc = w.document;
+      if (doc.documentElement?.hasAttribute("fe6-themed")) applyThemeAttr(doc);
+      const side = doc.getElementById?.("sidebar")?.contentDocument;
+      if (side?.documentElement?.hasAttribute("fe6-themed")) applyThemeAttr(side);
+      for (const b of doc.querySelectorAll?.("browser[type='content'], browser:not([remote='true'])") || []) {
+        const d = b.contentDocument;
+        if (d?.documentElement?.hasAttribute("fe6-themed")) applyThemeAttr(d);
+      }
+    } catch (e) {}
+  }
 }
 
 /* ------------------------------------------------------------------ toolbar widgets */
@@ -476,6 +653,8 @@ function el(doc, tag, attrs = {}, children = []) {
 function syncWindowAttrs(win) {
   const root = win.document.documentElement;
   root.setAttribute("fe6-scheme", effectiveScheme(win));
+  root.setAttribute("fe6-themed", "true");
+  applyThemeAttr(win.document);
   root.toggleAttribute("fe6-caption", getPref(PREF.caption, true));
   root.toggleAttribute("fe6-statusbar-hidden", !getPref(PREF.statusbar, true));
   root.toggleAttribute("fe6-show-appmenu", getPref(PREF.appMenu, false));
@@ -636,7 +815,6 @@ const SIDEBAR_ICONS = {
   viewResourceMonitorSidebar: "monitor",
   viewCustomizeSidebar: "customize",
 };
-const IE6_SIDEBAR_ICONS = { history: "history-hot.png", favorites: "favorites-hot.png" };
 function themeSidebarTools(win) {
   const SC = win.SidebarController;
   if (!SC || !SC.sidebars) return;
@@ -645,9 +823,7 @@ function themeSidebarTools(win) {
   let tools = null;
   try { tools = SC.toolsAndExtensions; } catch (e) {}
   for (const [id, name] of Object.entries(SIDEBAR_ICONS)) {
-    const url = hasIE6Icons() && IE6_SIDEBAR_ICONS[name]
-      ? "resource://fe6/ie6/" + IE6_SIDEBAR_ICONS[name]
-      : "resource://fe6/icons/" + name + ".svg";
+    const url = "resource://fe6/se98/" + name + "-16.png";
     for (const entry of [SC.sidebars.get?.(id), tools?.get?.(id)]) {
       if (entry && entry.iconUrl !== url) {
         entry.iconUrl = url;
@@ -702,12 +878,29 @@ function buildMenus(win) {
     });
     viewPopup.addEventListener("popupshowing", () => setChecked(sb, getPref(PREF.statusbar, true)));
     const schemeMenu = el(doc, "menu", { id: "fe6-scheme-menu", label: "Color Scheme", accesskey: "C" }, [popup]);
+
+    // View > Theme: Windows Standard or one of the Cathode themes (light and dark each)
+    const tpopup = el(doc, "menupopup", { id: "fe6-theme-popup" });
+    const titem = (id, label) => {
+      const mi = el(doc, "menuitem", { type: "radio", name: "fe6-theme", label, value: id });
+      mi.addEventListener("command", () => setTheme(id));
+      return mi;
+    };
+    tpopup.append(titem("classic", "Windows Standard"), el(doc, "menuseparator"));
+    for (const t of THEMES) tpopup.append(titem(t.id, themeLabel(t)));
+    tpopup.addEventListener("popupshowing", () => {
+      const cur = currentTheme();
+      for (const mi of tpopup.querySelectorAll("menuitem")) setChecked(mi, mi.getAttribute("value") === cur);
+    });
+    const themeMenu = el(doc, "menu", { id: "fe6-theme-menu", label: "Theme", accesskey: "h" }, [tpopup]);
+
     const anchor = doc.getElementById("viewToolbarsMenu");
     if (anchor) {
       anchor.after(sb);
       sb.after(schemeMenu);
+      schemeMenu.after(themeMenu);
     } else {
-      viewPopup.prepend(sb, schemeMenu);
+      viewPopup.prepend(sb, schemeMenu, themeMenu);
     }
   }
 
@@ -764,10 +957,11 @@ function injectSheet(win) {
     } catch (e) {
       log("agent sheet", e);
     }
-    if (hasIE6Icons()) {
-      win.windowUtils.loadSheetUsingURIString(IE6_CSS_URI, win.windowUtils.AUTHOR_SHEET);
-    }
+    win.windowUtils.loadSheetUsingURIString(SE98_CSS_URI, win.windowUtils.AUTHOR_SHEET);
+    win.windowUtils.loadSheetUsingURIString(THEMES_CSS_URI, win.windowUtils.AUTHOR_SHEET);
     win.document.documentElement?.setAttribute("fe6-scheme", effectiveScheme(win));
+    win.document.documentElement?.setAttribute("fe6-themed", "true");
+    applyThemeAttr(win.document);
   } catch (e) {
     console.error("[Fox Explorer 6] stylesheet failed", e);
   }
@@ -792,6 +986,32 @@ function injectPreferences(win) {
     rg.append(mkRadio("light", "Light (classic Windows 98)"), mkRadio("dark", "Dark (colours flipped)"), mkRadio("system", "Use system setting"));
     rg.value = getPref(PREF.scheme, "light");
     rg.addEventListener("command", () => setScheme(rg.value));
+    const themeRow = doc.createXULElement("hbox");
+    themeRow.setAttribute("align", "center");
+    const tl = doc.createXULElement("label");
+    tl.setAttribute("value", "Theme:");
+    tl.setAttribute("control", "fe6-theme-list");
+    const ml = doc.createXULElement("menulist");
+    ml.id = "fe6-theme-list";
+    const mp = doc.createXULElement("menupopup");
+    const opt = (v, l) => { const i = doc.createXULElement("menuitem"); i.setAttribute("value", v); i.setAttribute("label", l); return i; };
+    mp.append(opt("classic", "Windows Standard"));
+    for (const t of THEMES) mp.append(opt(t.id, themeLabel(t)));
+    ml.append(mp);
+    ml.value = currentTheme();
+    ml.addEventListener("command", () => setTheme(ml.value));
+    // keep the page in step when the scheme or theme is changed from the View menu
+    const follow = { observe() { ml.value = currentTheme(); rg.value = getPref(PREF.scheme, "light"); } };
+    Services.prefs.addObserver(PREF.theme, follow);
+    Services.prefs.addObserver(PREF.scheme, follow);
+    win.addEventListener("unload", () => {
+      Services.prefs.removeObserver(PREF.theme, follow);
+      Services.prefs.removeObserver(PREF.scheme, follow);
+    }, { once: true });
+    const themeDesc = doc.createXULElement("description");
+    themeDesc.className = "description-deemphasized";
+    themeDesc.textContent = "The Cathode themes match the Cathode desktop for KDE Plasma: the same grays as the taskbar, with that theme's colours in the title bar, selections, tabs and progress bars. Each one works in light and dark.";
+    themeRow.append(tl, ml);
     const cb = (label, pref, def) => {
       const c = doc.createXULElement("checkbox");
       c.setAttribute("label", label);
@@ -802,7 +1022,7 @@ function injectPreferences(win) {
     const box = doc.createXULElement("groupbox");
     box.id = "fe6-prefs";
     box.setAttribute("data-category", "paneGeneral");
-    box.append(h, desc, rg,
+    box.append(h, desc, rg, themeRow, themeDesc,
       cb("Show the Windows 98 title bar (turn off to use your desktop's own)", PREF.caption, true),
       cb("Show the status bar", PREF.statusbar, true),
       cb("Show the History menu", PREF.historyMenu, false));
@@ -825,8 +1045,19 @@ function registerGlobalSheets() {
     if (!sss.sheetRegistered(base, sss.AGENT_SHEET)) sss.loadAndRegisterSheet(base, sss.AGENT_SHEET);
     // colours follow Fox Explorer's own setting (not Firefox's guess from the desktop)
     const scheme = getPref(PREF.scheme, "light");
-    const want = scheme === "dark" ? "fe6-scrollbars-dark.css" : scheme === "system" ? "fe6-scrollbars-auto.css" : null;
-    for (const name of ["fe6-scrollbars-dark.css", "fe6-scrollbars-auto.css"]) {
+    const kind = currentTheme() === "classic" ? "" : "cathode-";   // Cathode themes use Cathode's grays
+    const want = scheme === "dark" ? `fe6-scrollbars-${kind}dark.css` : scheme === "system" ? `fe6-scrollbars-${kind}auto.css` : null;
+    // dark tooltips: the toolbar's default tooltip can't see the window's colours, so it
+    // follows the scheme through app-wide sheets, like the scroll bars
+    const wantTip = scheme === "dark" ? `fe6-agent-${kind}dark.css` : scheme === "system" ? `fe6-agent-${kind}auto.css` : null;
+    for (const name of ["fe6-agent-dark.css", "fe6-agent-auto.css", "fe6-agent-cathode-dark.css", "fe6-agent-cathode-auto.css"]) {
+      const u = uri(name);
+      const has = sss.sheetRegistered(u, sss.AGENT_SHEET);
+      if (name === wantTip && !has) sss.loadAndRegisterSheet(u, sss.AGENT_SHEET);
+      else if (name !== wantTip && has) sss.unregisterSheet(u, sss.AGENT_SHEET);
+    }
+    for (const name of ["fe6-scrollbars-dark.css", "fe6-scrollbars-auto.css",
+                        "fe6-scrollbars-cathode-dark.css", "fe6-scrollbars-cathode-auto.css"]) {
       const u = uri(name);
       const has = sss.sheetRegistered(u, sss.AGENT_SHEET);
       if (name === want && !has) sss.loadAndRegisterSheet(u, sss.AGENT_SHEET);
@@ -834,6 +1065,33 @@ function registerGlobalSheets() {
     }
   } catch (e) {
     console.error("[Fox Explorer 6] scroll bar sheet failed", e);
+  }
+  registerStartPageTheme();
+}
+
+/* The start page (resource://fe6/start.html) runs as a web page, so it can't see the window's
+   theme. Give it the theme's colours with a user sheet that only applies to that page. */
+let startSheetURI = null;
+function registerStartPageTheme() {
+  try {
+    const sss = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService);
+    if (startSheetURI && sss.sheetRegistered(startSheetURI, sss.USER_SHEET)) {
+      sss.unregisterSheet(startSheetURI, sss.USER_SHEET);
+    }
+    startSheetURI = null;
+    const t = THEMES.find(x => x.id === currentTheme());
+    if (!t) return;
+    const light = `--face:#c0c0c0;--hi:#fff;--light:#dfdfdf;--shadow:#808080;--dark:#000;--text:#000;--window:#f4f3ef;` +
+                  `--link:${t.linkLight};--capgrad:${t.grad};--desk:${t.deskLight};`;
+    const dark = `--face:#3a3a3a;--hi:#686868;--light:#4a4a4a;--shadow:#242424;--dark:#000;--text:#e8e8e8;--window:#2a2a2a;` +
+                 `--link:${t.linkDark};--capgrad:${t.grad};--desk:${t.deskDark};`;
+    const imp = decl => decl.replace(/;/g, " !important;");   // user sheets lose to the page otherwise
+    const css = `@-moz-document url-prefix("resource://fe6/start.html") {` +
+                `:root{${imp(light)}} @media (prefers-color-scheme: dark){:root{${imp(dark)}}} }`;
+    startSheetURI = Services.io.newURI("data:text/css;charset=utf-8," + encodeURIComponent(css));
+    sss.loadAndRegisterSheet(startSheetURI, sss.USER_SHEET);
+  } catch (e) {
+    console.error("[Fox Explorer 6] start page theme failed", e);
   }
 }
 
@@ -933,7 +1191,11 @@ export const FoxExplorer6 = {
       } else if (CHROME_DOC_PREFIXES.some(p => href.startsWith(p))) {
         try {
           win.windowUtils.loadSheetUsingURIString(CHROME_CSS_URI, win.windowUtils.AUTHOR_SHEET);
+          win.windowUtils.loadSheetUsingURIString(SE98_CSS_URI, win.windowUtils.AUTHOR_SHEET);
+          win.windowUtils.loadSheetUsingURIString(THEMES_CSS_URI, win.windowUtils.AUTHOR_SHEET);
           win.windowUtils.loadSheetUsingURIString(AGENT_CSS_URI, win.windowUtils.AGENT_SHEET);
+          doc.documentElement.setAttribute("fe6-themed", "true");
+          applyThemeAttr(doc);
         } catch (e) {
           log("chrome doc sheet", href, e);
         }
@@ -966,6 +1228,10 @@ export const FoxExplorer6 = {
           registerGlobalSheets();
         }
         if (data === PREF.caption) syncTitlebarPref();
+        if (data === PREF.theme || data === PREF.scheme) {
+          registerGlobalSheets();
+          applyThemeEverywhere();
+        }
         for (const w of Services.wm.getEnumerator("navigator:browser")) syncWindowAttrs(w);
       },
     };

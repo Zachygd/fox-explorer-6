@@ -1,5 +1,5 @@
 work/
 dist/
 __pycache__/
-# IE6 icons converted from your own IE6 media — Microsoft artwork, never commit
+# old IE6 icon imports (Microsoft artwork, no longer used): never commit
 theme/fe6/ie6/

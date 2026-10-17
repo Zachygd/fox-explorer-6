@@ -1,0 +1,4 @@
+/* Fox Explorer 6 — dark tooltips for the Cathode themes when the scheme follows the system; see fe6-agent-cathode-dark.css */
+@media (prefers-color-scheme: dark) {
+  tooltip:not(#fe6-none) { background: #30302a !important; color: #e8e8e8 !important; border-color: #000 !important; }
+}
