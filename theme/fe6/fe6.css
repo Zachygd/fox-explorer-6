@@ -158,12 +158,7 @@ body, #browser { background: var(--fe-face) !important; color: var(--fe-text) !i
 :root[sizemode="maximized"] #fe6-cap-max { background-image: url("icons/cap-restore.svg"); }
 #fe6-cap-close { background-image: url("icons/cap-close.svg"); margin-inline-start: 2px !important; }
 
-/* Win98 window frame around the whole window when it isn't maximised */
-:root[customtitlebar][fe6-caption][sizemode="normal"] body,
-:root[tabsintitlebar][fe6-caption][sizemode="normal"] body {
-  box-shadow: var(--fe-raised);
-  padding: 2px;
-}
+/* (the Win98 window frame, windowed and coloured, is at the end of this file) */
 
 /* ===================================================================== menu bar */
 #toolbar-menubar { padding-inline-end: 0 !important; }
@@ -1068,23 +1063,38 @@ sidebar-main, #sidebar-main {
     var(--fe-cs-hi) 65% 70%, var(--fe-cs-lo) 70% 80%, transparent 80% 85%,
     var(--fe-cs-hi) 85% 90%, var(--fe-cs-lo) 90% 100%) !important;
 }
-/* the sides of the page area pick up the colour, framing it together with the status bar */
-:root[fe6-colored-status] #tabbrowser-tabbox { background: var(--fe-accent, var(--fe-sel)) !important; padding: 0 3px !important; }
+/* and a frame of the colour runs all the way round the window (see "window frame" below) */
 
-/* ===================================================================== windowed mode
+/* ===================================================================== window frame
    Firefox's Linux theme clips the window to the GTK title bar's rounded corners when it isn't
-   maximised. Cathode windows are square, with the Windows 98 frame, so drop the rounding. */
-:root[customtitlebar] :is(body, dialog::backdrop) {
+   maximised. Cathode windows are square, so drop the rounding. (Separate selectors on purpose:
+   a pseudo-element like ::backdrop inside :is() makes the whole rule invalid.) */
+:root[customtitlebar] body,
+:root[customtitlebar] dialog::backdrop,
+:root[tabsintitlebar] body {
   border-radius: 0 !important;
 }
-:root[customtitlebar][fe6-caption][sizemode="normal"] body,
-:root[tabsintitlebar][fe6-caption][sizemode="normal"] body {
-  /* the Win98 window border: light/white outside top-left, gray/black bottom-right, 3px of face */
+
+/* the frames below are body padding: count it inside the window, or the window's contents
+   spill past its right and bottom edges and the frame gets cut off there */
+:root body { box-sizing: border-box !important; max-width: 100vw !important; max-height: 100vh !important; }
+
+/* Windowed: the Windows 98 window border round the whole window, 2px bevel + 2px of face */
+:root:is([customtitlebar], [tabsintitlebar])[fe6-caption][sizemode="normal"] body {
   box-shadow: var(--fe-raised) !important;
+  padding: 4px !important;
+}
+
+/* Colored status bar: the frame round the whole window is the scheme colour. Windowed, it sits
+   inside the Win98 bevel; maximised, it's a 3px band round the edge of the screen. */
+:root[fe6-colored-status] body {
   padding: 3px !important;
+  box-shadow: inset 0 0 0 3px var(--fe-accent, var(--fe-sel)) !important;
 }
-:root[fe6-colored-status][customtitlebar][fe6-caption][sizemode="normal"] body,
-:root[fe6-colored-status][tabsintitlebar][fe6-caption][sizemode="normal"] body {
-  /* coloured frame: the scheme colour between the Win98 bevels */
-  box-shadow: var(--fe-raised), inset 0 0 0 3px var(--fe-accent, var(--fe-sel)) !important;
+:root[fe6-colored-status]:is([customtitlebar], [tabsintitlebar])[fe6-caption][sizemode="normal"] body {
+  padding: 5px !important;
+  box-shadow: var(--fe-raised), inset 0 0 0 5px var(--fe-accent, var(--fe-sel)) !important;
 }
+:root[fe6-colored-status]:is([inFullscreen], [inDOMFullscreen]) body { padding: 0 !important; box-shadow: none !important; }
+/* the caption bar's own margin would leave a gray gap between it and the coloured frame */
+:root[fe6-colored-status] #fe6-caption { margin: 0 0 1px !important; }
