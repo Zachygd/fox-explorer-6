@@ -16,4 +16,7 @@ rpmbuild -bb "$HERE/packaging/foxexplorer6.spec" \
   --define "fe_release $(date +%Y%m%d%H%M)" \
   --define "fe_tarball $(basename "$TARBALL")"
 mkdir -p "$HERE/dist"
+# keep only the newest RPM in dist/, so "dnf install ./dist/foxexplorer6-*.rpm" can't pick an old one
+rm -f "$HERE/dist"/foxexplorer6-*.rpm
 find "$TOP/RPMS" -name '*.rpm' -exec cp {} "$HERE/dist/" \; -print
+echo "Install or update with:  sudo dnf install $HERE/dist/foxexplorer6-*.rpm"

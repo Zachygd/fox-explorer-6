@@ -85,7 +85,15 @@ sudo ./foxexplorer6/foxexplorer/install.sh --uninstall
 
 Mozilla's built-in updater is switched off, because it would overwrite the Fox Explorer changes.
 **Re-run `scripts/build-repack.sh --rpm` whenever Firefox has a new release** (roughly every four
-weeks, plus security fixes) and install the new RPM. `--channel esr` gives fewer, slower-moving
+weeks, plus security fixes) and install the new RPM. The same command picks up Fox Explorer's own
+updates:
+
+```bash
+cd ~/fox-explorer-6 && git pull && scripts/build-repack.sh --rpm && sudo dnf install ./dist/foxexplorer6-*.rpm
+```
+
+Use `dnf install`, not `dnf reinstall`: every build has a newer release number, and `install`
+upgrades to it. Then close every Fox Explorer window and start it again. `--channel esr` gives fewer, slower-moving
 updates if you'd rather.
 
 ## Build from source
