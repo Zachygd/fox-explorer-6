@@ -177,8 +177,9 @@ const THEMES = [
 // END GENERATED THEMES
 const PREF = {
   scheme: "foxexplorer.colorScheme",       // "light" | "dark" | "system"
-  theme: "foxexplorer.theme",              // "classic" (Windows Standard) or a Cathode theme id
+  theme: "foxexplorer.theme",              // "classic" (plain Cathode) or a Cathode colour scheme id
   statusbar: "foxexplorer.statusBar",      // bool
+  coloredStatus: "foxexplorer.coloredStatusBar", // bool: status bar and window frame in the scheme colour
   caption: "foxexplorer.classicTitlebar",  // bool: draw the Win98 title bar
   historyMenu: "foxexplorer.showHistoryMenu",
   appMenu: "foxexplorer.showAppMenu",
@@ -281,15 +282,16 @@ function currentTheme() {
 }
 
 function themeLabel(t) {
-  return t.id === "cathode" ? "Cathode" : "Cathode " + t.name;
+  return t.id === "cathode" ? "Cathode Color" : "Cathode " + t.name;
 }
+const BASE_LABEL = "Cathode";   // "classic": Cathode's standard colours, without accents
 
 function setTheme(value) {
   Services.prefs.setStringPref(PREF.theme, value);
 }
 
 /* Put the theme on a document: <html fe6-theme="teal"> selects its palette in fe6-themes.css
-   and turns on the Cathode accents in fe6.css. Windows Standard has no attribute. */
+   and turns on the Cathode accents in fe6.css. Plain Cathode has no attribute. */
 function applyThemeAttr(doc) {
   const root = doc?.documentElement;
   if (!root) return;
@@ -657,6 +659,7 @@ function syncWindowAttrs(win) {
   applyThemeAttr(win.document);
   root.toggleAttribute("fe6-caption", getPref(PREF.caption, true));
   root.toggleAttribute("fe6-statusbar-hidden", !getPref(PREF.statusbar, true));
+  root.toggleAttribute("fe6-colored-status", getPref(PREF.coloredStatus, false));
   root.toggleAttribute("fe6-show-appmenu", getPref(PREF.appMenu, false));
   const hist = win.document.getElementById("history-menu");
   if (hist) hist.hidden = !getPref(PREF.historyMenu, false);
@@ -860,13 +863,13 @@ function buildMenus(win) {
   relabel(doc, "menu_bookmarkThisPage", "Add to Favorites...", "A");
   relabel(doc, "bookmarksShowAll", "Organize Favorites...", "O");
 
-  // View > Status Bar, View > Color Scheme
+  // View > Status Bar, Colored Status Bar, Light/Dark Mode, Color Scheme
   const viewPopup = doc.getElementById("menu_viewPopup");
   if (viewPopup) {
     const sb = el(doc, "menuitem", { id: "fe6-statusbar-item", type: "checkbox", label: "Status Bar", accesskey: "B" });
     sb.addEventListener("command", () => Services.prefs.setBoolPref(PREF.statusbar, !getPref(PREF.statusbar, true)));
     const popup = el(doc, "menupopup", { id: "fe6-scheme-popup" });
-    const items = [["light", "Light (Classic)"], ["dark", "Dark"], ["system", "Use System Setting"]];
+    const items = [["light", "Light"], ["dark", "Dark"], ["system", "Use System Setting"]];
     for (const [v, l] of items) {
       const mi = el(doc, "menuitem", { type: "radio", name: "fe6-scheme", label: l, value: v });
       mi.addEventListener("command", () => setScheme(v));
@@ -876,31 +879,37 @@ function buildMenus(win) {
       const cur = getPref(PREF.scheme, "light");
       for (const mi of popup.children) setChecked(mi, mi.getAttribute("value") === cur);
     });
-    viewPopup.addEventListener("popupshowing", () => setChecked(sb, getPref(PREF.statusbar, true)));
-    const schemeMenu = el(doc, "menu", { id: "fe6-scheme-menu", label: "Color Scheme", accesskey: "C" }, [popup]);
+    const csb = el(doc, "menuitem", { id: "fe6-colored-status-item", type: "checkbox", label: "Colored Status Bar", accesskey: "o" });
+    csb.addEventListener("command", () => Services.prefs.setBoolPref(PREF.coloredStatus, !getPref(PREF.coloredStatus, false)));
+    viewPopup.addEventListener("popupshowing", () => {
+      setChecked(sb, getPref(PREF.statusbar, true));
+      setChecked(csb, getPref(PREF.coloredStatus, false));
+    });
+    const schemeMenu = el(doc, "menu", { id: "fe6-scheme-menu", label: "Light/Dark Mode", accesskey: "M" }, [popup]);
 
-    // View > Theme: Windows Standard or one of the Cathode themes (light and dark each)
+    // View > Color Scheme: plain Cathode or one of the Cathode colour schemes (each light and dark)
     const tpopup = el(doc, "menupopup", { id: "fe6-theme-popup" });
     const titem = (id, label) => {
       const mi = el(doc, "menuitem", { type: "radio", name: "fe6-theme", label, value: id });
       mi.addEventListener("command", () => setTheme(id));
       return mi;
     };
-    tpopup.append(titem("classic", "Windows Standard"), el(doc, "menuseparator"));
+    tpopup.append(titem("classic", BASE_LABEL), el(doc, "menuseparator"));
     for (const t of THEMES) tpopup.append(titem(t.id, themeLabel(t)));
     tpopup.addEventListener("popupshowing", () => {
       const cur = currentTheme();
       for (const mi of tpopup.querySelectorAll("menuitem")) setChecked(mi, mi.getAttribute("value") === cur);
     });
-    const themeMenu = el(doc, "menu", { id: "fe6-theme-menu", label: "Theme", accesskey: "h" }, [tpopup]);
+    const themeMenu = el(doc, "menu", { id: "fe6-theme-menu", label: "Color Scheme", accesskey: "C" }, [tpopup]);
 
     const anchor = doc.getElementById("viewToolbarsMenu");
     if (anchor) {
       anchor.after(sb);
-      sb.after(schemeMenu);
+      sb.after(csb);
+      csb.after(schemeMenu);
       schemeMenu.after(themeMenu);
     } else {
-      viewPopup.prepend(sb, schemeMenu, themeMenu);
+      viewPopup.prepend(sb, csb, schemeMenu, themeMenu);
     }
   }
 
@@ -979,23 +988,23 @@ function injectPreferences(win) {
     h.textContent = "Fox Explorer 6";
     const desc = doc.createXULElement("description");
     desc.className = "description-deemphasized";
-    desc.textContent = "Classic look settings. Dark mode flips the Windows 98 colours; websites follow it too unless you pick something else under Website appearance.";
+    desc.textContent = "Light/Dark mode: websites follow it too, unless you pick something else under Website appearance.";
     const mkRadio = (v, l) => { const r = doc.createXULElement("radio"); r.setAttribute("value", v); r.setAttribute("label", l); return r; };
     const rg = doc.createXULElement("radiogroup");
     rg.id = "fe6-scheme-radios";
-    rg.append(mkRadio("light", "Light (classic Windows 98)"), mkRadio("dark", "Dark (colours flipped)"), mkRadio("system", "Use system setting"));
+    rg.append(mkRadio("light", "Light"), mkRadio("dark", "Dark"), mkRadio("system", "Use system setting"));
     rg.value = getPref(PREF.scheme, "light");
     rg.addEventListener("command", () => setScheme(rg.value));
     const themeRow = doc.createXULElement("hbox");
     themeRow.setAttribute("align", "center");
     const tl = doc.createXULElement("label");
-    tl.setAttribute("value", "Theme:");
+    tl.setAttribute("value", "Color scheme:");
     tl.setAttribute("control", "fe6-theme-list");
     const ml = doc.createXULElement("menulist");
     ml.id = "fe6-theme-list";
     const mp = doc.createXULElement("menupopup");
     const opt = (v, l) => { const i = doc.createXULElement("menuitem"); i.setAttribute("value", v); i.setAttribute("label", l); return i; };
-    mp.append(opt("classic", "Windows Standard"));
+    mp.append(opt("classic", BASE_LABEL));
     for (const t of THEMES) mp.append(opt(t.id, themeLabel(t)));
     ml.append(mp);
     ml.value = currentTheme();
@@ -1010,7 +1019,7 @@ function injectPreferences(win) {
     }, { once: true });
     const themeDesc = doc.createXULElement("description");
     themeDesc.className = "description-deemphasized";
-    themeDesc.textContent = "The Cathode themes match the Cathode desktop for KDE Plasma: the same grays as the taskbar, with that theme's colours in the title bar, selections, tabs and progress bars. Each one works in light and dark.";
+    themeDesc.textContent = "The colour schemes match the Cathode desktop for KDE Plasma: the same grays as the taskbar, with the scheme's colour in the title bar, selections, tabs, menus and progress bars. Each one works in light and dark mode.";
     themeRow.append(tl, ml);
     const cb = (label, pref, def) => {
       const c = doc.createXULElement("checkbox");
@@ -1025,6 +1034,7 @@ function injectPreferences(win) {
     box.append(h, desc, rg, themeRow, themeDesc,
       cb("Show the Windows 98 title bar (turn off to use your desktop's own)", PREF.caption, true),
       cb("Show the status bar", PREF.statusbar, true),
+      cb("Colored status bar (the status bar and window frame take the colour scheme's colour)", PREF.coloredStatus, false),
       cb("Show the History menu", PREF.historyMenu, false));
     anchor.before(box);
     const sync = () => { box.hidden = !/^#?(general)?$/.test(win.location.hash || ""); };
@@ -1045,19 +1055,18 @@ function registerGlobalSheets() {
     if (!sss.sheetRegistered(base, sss.AGENT_SHEET)) sss.loadAndRegisterSheet(base, sss.AGENT_SHEET);
     // colours follow Fox Explorer's own setting (not Firefox's guess from the desktop)
     const scheme = getPref(PREF.scheme, "light");
-    const kind = currentTheme() === "classic" ? "" : "cathode-";   // Cathode themes use Cathode's grays
+    const kind = "cathode-";   // every colour scheme uses Cathode's grays
     const want = scheme === "dark" ? `fe6-scrollbars-${kind}dark.css` : scheme === "system" ? `fe6-scrollbars-${kind}auto.css` : null;
     // dark tooltips: the toolbar's default tooltip can't see the window's colours, so it
     // follows the scheme through app-wide sheets, like the scroll bars
     const wantTip = scheme === "dark" ? `fe6-agent-${kind}dark.css` : scheme === "system" ? `fe6-agent-${kind}auto.css` : null;
-    for (const name of ["fe6-agent-dark.css", "fe6-agent-auto.css", "fe6-agent-cathode-dark.css", "fe6-agent-cathode-auto.css"]) {
+    for (const name of ["fe6-agent-cathode-dark.css", "fe6-agent-cathode-auto.css"]) {
       const u = uri(name);
       const has = sss.sheetRegistered(u, sss.AGENT_SHEET);
       if (name === wantTip && !has) sss.loadAndRegisterSheet(u, sss.AGENT_SHEET);
       else if (name !== wantTip && has) sss.unregisterSheet(u, sss.AGENT_SHEET);
     }
-    for (const name of ["fe6-scrollbars-dark.css", "fe6-scrollbars-auto.css",
-                        "fe6-scrollbars-cathode-dark.css", "fe6-scrollbars-cathode-auto.css"]) {
+    for (const name of ["fe6-scrollbars-cathode-dark.css", "fe6-scrollbars-cathode-auto.css"]) {
       const u = uri(name);
       const has = sss.sheetRegistered(u, sss.AGENT_SHEET);
       if (name === want && !has) sss.loadAndRegisterSheet(u, sss.AGENT_SHEET);
@@ -1079,7 +1088,9 @@ function registerStartPageTheme() {
       sss.unregisterSheet(startSheetURI, sss.USER_SHEET);
     }
     startSheetURI = null;
-    const t = THEMES.find(x => x.id === currentTheme());
+    // plain Cathode ("classic") uses the standard Cathode colours, like "Cathode Color"
+    const id = currentTheme() === "classic" ? "cathode" : currentTheme();
+    const t = THEMES.find(x => x.id === id);
     if (!t) return;
     const light = `--face:#c0c0c0;--hi:#fff;--light:#dfdfdf;--shadow:#808080;--dark:#000;--text:#000;--window:#f4f3ef;` +
                   `--link:${t.linkLight};--capgrad:${t.grad};--desk:${t.deskLight};`;

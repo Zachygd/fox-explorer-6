@@ -1017,7 +1017,7 @@ sidebar-main, #sidebar-main {
 #fe6-search-popup menuitem[fe6-bold] :is(.menu-text, .menu-iconic-text, label) { font-weight: bold !important; }
 
 /* ===================================================================== Cathode accents
-   Only with a Cathode theme (View › Theme). The gray of the toolbars stays the same as the
+   Only with a Cathode colour scheme (View › Color Scheme). The gray of the toolbars stays the same as the
    Cathode taskbar; the theme's colours go into the details, the way Cathode does on the desktop. */
 /* the selected tab gets a strip of the title-bar gradient along its top edge */
 :root[fe6-theme] .tabbrowser-tab[visuallyselected] .tab-background {
@@ -1036,6 +1036,55 @@ sidebar-main, #sidebar-main {
 }
 /* the Address bar shows a theme-coloured edge while you type in it */
 :root[fe6-theme] #urlbar[focused] :is(#urlbar-background, .urlbar-background) { box-shadow: var(--fe-sunken), inset 0 0 0 3px var(--fe-accent) !important; }
-/* a thin rule of the title-bar gradient under the menu bar, like Cathode's Start menu banner */
-:root[fe6-theme] #toolbar-menubar { border-bottom: 2px solid transparent !important; border-image: var(--fe-cap-grad) 1 !important; }
-:root[fe6-theme] #toolbar-menubar[autohide="true"][inactive] { border-bottom: 0 !important; }
+/* the logo box at the right end of the menu bar takes the scheme colour: a quiet hint of it */
+:root[fe6-theme] #fe6-throbber { background: var(--fe-accent) !important; }
+
+/* the New Tab button on the tab strip: gray until you point at it, like the other buttons */
+#TabsToolbar :is(#tabs-newtab-button, #new-tab-button, .tabs-newtab-button) > .toolbarbutton-icon { filter: var(--fe-cold-filter); }
+#TabsToolbar :is(#tabs-newtab-button, #new-tab-button, .tabs-newtab-button):not([disabled]):is(:hover, [open]) > .toolbarbutton-icon { filter: none; }
+
+/* ===================================================================== Colored status bar
+   View › Colored Status Bar: the status bar and the window frame take the colour scheme's
+   colour (plain Cathode: Cathode blue). The bevels become light/dark tints of that colour, and
+   the progress blocks turn white so they show up on it. */
+:root[fe6-colored-status] {
+  --fe-cs-hi: rgba(255, 255, 255, .45);
+  --fe-cs-lo: rgba(0, 0, 0, .45);
+}
+:root[fe6-colored-status] #fe6-statusbar {
+  background: var(--fe-accent, var(--fe-sel)) !important;
+  border-top-color: var(--fe-accent, var(--fe-sel)) !important;
+  color: #ffffff !important;
+}
+:root[fe6-colored-status] #fe6-statusbar label { color: #ffffff !important; }
+:root[fe6-colored-status] .fe6-pane { box-shadow: inset -1px -1px var(--fe-cs-hi), inset 1px 1px var(--fe-cs-lo) !important; }
+:root[fe6-colored-status] #fe6-status-progress { background: rgba(0, 0, 0, .25); }
+:root[fe6-colored-status] #fe6-status-meter {
+  background: repeating-linear-gradient(to right, #ffffff 0 8px, transparent 8px 10px) !important;
+}
+:root[fe6-colored-status] #fe6-status-grip {
+  background: linear-gradient(135deg,
+    transparent 0 45%, var(--fe-cs-hi) 45% 50%, var(--fe-cs-lo) 50% 60%, transparent 60% 65%,
+    var(--fe-cs-hi) 65% 70%, var(--fe-cs-lo) 70% 80%, transparent 80% 85%,
+    var(--fe-cs-hi) 85% 90%, var(--fe-cs-lo) 90% 100%) !important;
+}
+/* the sides of the page area pick up the colour, framing it together with the status bar */
+:root[fe6-colored-status] #tabbrowser-tabbox { background: var(--fe-accent, var(--fe-sel)) !important; padding: 0 3px !important; }
+
+/* ===================================================================== windowed mode
+   Firefox's Linux theme clips the window to the GTK title bar's rounded corners when it isn't
+   maximised. Cathode windows are square, with the Windows 98 frame, so drop the rounding. */
+:root[customtitlebar] :is(body, dialog::backdrop) {
+  border-radius: 0 !important;
+}
+:root[customtitlebar][fe6-caption][sizemode="normal"] body,
+:root[tabsintitlebar][fe6-caption][sizemode="normal"] body {
+  /* the Win98 window border: light/white outside top-left, gray/black bottom-right, 3px of face */
+  box-shadow: var(--fe-raised) !important;
+  padding: 3px !important;
+}
+:root[fe6-colored-status][customtitlebar][fe6-caption][sizemode="normal"] body,
+:root[fe6-colored-status][tabsintitlebar][fe6-caption][sizemode="normal"] body {
+  /* coloured frame: the scheme colour between the Win98 bevels */
+  box-shadow: var(--fe-raised), inset 0 0 0 3px var(--fe-accent, var(--fe-sel)) !important;
+}

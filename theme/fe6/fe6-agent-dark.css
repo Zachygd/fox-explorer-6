@@ -1,4 +1,0 @@
-/* Fox Explorer 6 — dark tooltips for Windows Standard. The toolbar's default tooltip is native
-   anonymous content that can't see the window's colours, so fe6-boot.sys.mjs registers this
-   app-wide when the colour scheme is Dark (the -auto sheet is for "Use system setting"). */
-tooltip:not(#fe6-none) { background: #1e1e00 !important; color: #ffffff !important; border-color: #000 !important; }

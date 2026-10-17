@@ -50,8 +50,8 @@
   --fe-tiptext: #ffffff;
   --fe-link: #8fb4ff;
   --fe-progress: #3a6ad8;
-  --fe-cold-filter: grayscale(1) brightness(1.6);
-  --fe-disabled-filter: grayscale(1) brightness(1.2) opacity(.35);
+  --fe-cold-filter: grayscale(1) contrast(1.15);
+  --fe-disabled-filter: grayscale(1) opacity(.4);
 }
 :root {
   /* reusable bevels (Win98 draws them with two 1px lines on each side) */
@@ -61,7 +61,7 @@
   --fe-thin-raised: inset -1px -1px var(--fe-shadow), inset 1px 1px var(--fe-hi);
   --fe-thin-sunken: inset -1px -1px var(--fe-hi), inset 1px 1px var(--fe-shadow);
   --fe-gripper: linear-gradient(to right, var(--fe-hi) 0 1px, var(--fe-face) 1px 2px, var(--fe-shadow) 2px 3px);
-  /* title bar gradient: two stops for Windows Standard; Cathode themes (fe6-themes.css) set
+  /* title bar gradient: two stops by default; the Cathode colour schemes (fe6-themes.css) set
      their own, which can have more stops (Spectrum, Sunset) */
   --fe-cap-grad: linear-gradient(to right, var(--fe-cap1), var(--fe-cap2));
 }
@@ -91,7 +91,7 @@
   --fe-tiptext: #ffffff;
   --fe-link: #8fb4ff;
   --fe-progress: #3a6ad8;
-  --fe-cold-filter: grayscale(1) brightness(1.6);
-  --fe-disabled-filter: grayscale(1) brightness(1.2) opacity(.35);
+  --fe-cold-filter: grayscale(1) contrast(1.15);
+  --fe-disabled-filter: grayscale(1) opacity(.4);
 }
 }

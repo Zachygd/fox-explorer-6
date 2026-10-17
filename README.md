@@ -2,7 +2,7 @@
 
 **Firefox, dressed as Internet Explorer 6 on Windows 98** — for Fedora Linux 44 and other Linux systems.
 
-![Fox Explorer 6 in the Windows Standard theme](docs/screenshots/light-start.png)
+![Fox Explorer 6 in the Cathode colour scheme](docs/screenshots/light-start.png)
 
 Fox Explorer 6 is built from Mozilla's Firefox source ([mozilla-firefox/firefox](https://github.com/mozilla-firefox/firefox)).
 It's still a current Firefox underneath, so tabs, Firefox extensions, Sync, private windows and
@@ -20,38 +20,38 @@ every modern setting work as normal. Only the look changes:
   Internet / My Computer zone panes.
 - **IE5/6 hot-tracking:** toolbar icons are grey until you point at them, then show colour on a
   raised bevel and press in when clicked.
-- **Classic menus:** grey menus with navy highlight, etched separators, checkmarks and radio dots,
+- **Classic menus:** grey menus with blue highlight, etched separators, checkmarks and radio dots,
   and yellow tooltips. The menus are relabelled to **Favorites** ("Add to Favorites…", "Organize
   Favorites…") and **Tools › Internet Options…**, which opens Firefox's full settings.
 - **Icons:** the toolbar, menus, sidebar, Library and status bar use the **SE98** icon set by
   [nestoris](https://github.com/nestoris/Win98SE) (GPL-2.0), a faithful Windows 98 SE style set.
-- **Themes:** **Windows Standard** (classic Windows 98), plus every **Cathode** colour theme from
-  the [Cathode KDE theme](https://github.com/Zachygd/Cathode-KDE-Theme): Cathode, Brick, Pumpkin,
-  Wheat, Ember, Spruce, Meadow, Marine, Teal, Plum, Eggplant, Rose, Storm, Slate, Spectrum and
-  Sunset. The Cathode themes use the same grays as the Cathode taskbar and windows, and add the
-  theme's colour as accents: the title bar, a stripe on the selected tab, the open menu,
-  selections, hot-tracked buttons, links, progress bars and the sidebar header.
+- **Colour schemes:** **Cathode**, the standard scheme of the
+  [Cathode KDE theme](https://github.com/Zachygd/Cathode-KDE-Theme), plus all its colour schemes:
+  Cathode Color, Brick, Pumpkin, Wheat, Ember, Spruce, Meadow, Marine, Teal, Plum, Eggplant, Rose,
+  Storm, Slate, Spectrum and Sunset. Every scheme uses the same grays as the Cathode taskbar and
+  windows. The colour schemes add their colour as accents: the title bar, a stripe on the selected
+  tab, the open menu, the logo box, selections, hot-tracked buttons, links, progress bars and the
+  sidebar header.
+- **Colored status bar** (optional): the status bar and the window frame take the scheme's colour.
+- **Light/Dark mode:** every scheme comes in light and dark (Cathode's dark grays), or
+  **Use System Setting** to follow your desktop. Websites that support dark mode follow it.
 - **Downloads:** while a file downloads, the Downloads button plays a Windows 98 style animation
   (a page flying from the globe into the folder) with a small block progress bar under it.
-- **Light mode:** the Windows 98 "Windows Standard" colour scheme.
-- **Dark mode:** the same scheme with every colour's lightness flipped. The 3D lighting stays
-  top-left, so buttons still look raised. Websites that support dark mode follow it.
-- **Use System Setting:** follows GNOME/KDE light or dark automatically.
 
-| Cathode | Cathode Teal, dark |
+| Cathode Color | Cathode Teal, dark |
 |---|---|
-| ![Cathode theme](docs/screenshots/cathode-light.png) | ![Cathode Teal in dark mode](docs/screenshots/cathode-teal-dark.png) |
-| **Cathode Spruce** | **Windows Standard, dark** |
-| ![Cathode Spruce theme](docs/screenshots/cathode-spruce-light.png) | ![Windows Standard in dark mode](docs/screenshots/dark-start.png) |
+| ![Cathode Color](docs/screenshots/cathode-light.png) | ![Cathode Teal in dark mode](docs/screenshots/cathode-teal-dark.png) |
+| **Cathode Brick, colored status bar** | **Cathode, dark** |
+| ![Cathode Brick with the colored status bar](docs/screenshots/cathode-brick-colored.png) | ![Cathode in dark mode](docs/screenshots/dark-start.png) |
 
-Pick a theme from **View › Theme**, and light or dark from **View › Color Scheme**. Both are
-also in **Tools › Internet Options** (the *Fox Explorer 6* section at the top of General). Every
-theme works in light and dark. Fox Explorer doesn't follow your KDE colour scheme by itself:
-choose the matching theme once and it stays.
+Pick a colour scheme from **View › Color Scheme**, light or dark from **View › Light/Dark Mode**,
+and turn on **View › Colored Status Bar** if you like. All three are also in **Tools › Internet
+Options** (the *Fox Explorer 6* section at the top of General). Fox Explorer doesn't follow your
+KDE colour scheme by itself: choose the matching one once and it stays.
 
-| View › Theme | Internet Options |
+| View › Color Scheme | Internet Options |
 |---|---|
-| ![Theme menu](docs/screenshots/theme-menu.png) | ![Settings](docs/screenshots/settings.png) |
+| ![Color Scheme menu](docs/screenshots/theme-menu.png) | ![Settings](docs/screenshots/settings.png) |
 
 ---
 
@@ -132,7 +132,7 @@ and 1–3 hours.
 | [`scripts/make-appini.py`](scripts/make-appini.py) | Gives Fox Explorer its own profile (`~/.mozilla/foxexplorer6`) and window class, so it sits beside a normal Firefox without sharing anything. Internally the app is still named *Firefox*, so websites and addons.mozilla.org treat it as Firefox. |
 | [`art/`](art) | The app logo and the scripts that generate the icon set and branding sizes. |
 | [`theme/fe6/se98/`](theme/fe6/se98) | The SE98 icons by nestoris (GPL-2.0) and `se98.css`, which puts them on Firefox's buttons. Made by [`art/make_se98.py`](art/make_se98.py) from a clone of [Win98SE](https://github.com/nestoris/Win98SE); the Downloads animation by [`art/make_download_anim.py`](art/make_download_anim.py). |
-| [`theme/fe6/fe6-themes.css`](theme/fe6/fe6-themes.css) | The Cathode themes, light and dark. Made by [`art/make_themes.py`](art/make_themes.py) from the Cathode KDE theme's colour table (`build/schemes.py`), so a new Cathode scheme is one re-run away. |
+| [`theme/fe6/fe6-themes.css`](theme/fe6/fe6-themes.css) | The Cathode colour schemes (plain Cathode and every colour scheme), light and dark. Made by [`art/make_themes.py`](art/make_themes.py) from the Cathode KDE theme's colour table (`build/schemes.py`), so a new Cathode scheme is one re-run away. |
 
 ### Settings
 
@@ -140,8 +140,9 @@ All of these are in **about:config**, and most are also in **Tools › Internet 
 
 | Pref | Default | |
 |---|---|---|
-| `foxexplorer.colorScheme` | `light` | `light`, `dark` or `system` |
-| `foxexplorer.theme` | `classic` | `classic` (Windows Standard) or a Cathode theme: `cathode`, `brick`, `pumpkin`, `wheat`, `ember`, `spruce`, `meadow`, `marine`, `teal`, `plum`, `eggplant`, `rose`, `storm`, `slate`, `spectrum`, `sunset` |
+| `foxexplorer.colorScheme` | `light` | Light/Dark mode: `light`, `dark` or `system` |
+| `foxexplorer.theme` | `classic` | Colour scheme: `classic` (Cathode) or `cathode`, `brick`, `pumpkin`, `wheat`, `ember`, `spruce`, `meadow`, `marine`, `teal`, `plum`, `eggplant`, `rose`, `storm`, `slate`, `spectrum`, `sunset` (`cathode` is Cathode Color) |
+| `foxexplorer.coloredStatusBar` | `false` | also **View › Colored Status Bar** |
 | `foxexplorer.classicTitlebar` | `true` | Win98 caption bar; `false` hands the title bar back to your desktop |
 | `foxexplorer.statusBar` | `true` | also **View › Status Bar** |
 | `foxexplorer.showHistoryMenu` | `false` | IE6 had no History menu; turn Firefox's back on |
@@ -164,7 +165,8 @@ Your own `userChrome.css` still works on top (`toolkit.legacyUserProfileCustomiz
   `sudo dnf install wine-tahoma-fonts-system` (the `-system` package makes it available to all apps).
 - **Title bar:** the Win98 caption needs Firefox's "custom title bar", which works on GNOME/KDE
   Wayland and on compositing X11 desktops. Where it isn't available, Fox Explorer falls back to
-  your desktop's normal title bar automatically.
+  your desktop's normal title bar automatically. On the Cathode desktop you can also untick
+  *Show the Windows 98 title bar* in Internet Options to get KDE's own Cathode window decoration.
 - The quick build uses Mozilla's official binary, so Mozilla's telemetry defaults apply. You can
   turn them off under **Internet Options › Privacy & Security**. Source builds made with unofficial
   branding don't send telemetry.
