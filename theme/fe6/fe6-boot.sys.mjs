@@ -179,7 +179,7 @@ const PREF = {
   scheme: "foxexplorer.colorScheme",       // "light" | "dark" | "system"
   theme: "foxexplorer.theme",              // "classic" (plain Cathode) or a Cathode colour scheme id
   statusbar: "foxexplorer.statusBar",      // bool
-  coloredStatus: "foxexplorer.coloredStatusBar", // bool: status bar and window frame in the scheme colour
+  colorPop: "foxexplorer.colorPop",        // bool: Color Pop - window edges, status bar and page frame in the scheme colour
   caption: "foxexplorer.classicTitlebar",  // bool: draw the Win98 title bar
   historyMenu: "foxexplorer.showHistoryMenu",
   appMenu: "foxexplorer.showAppMenu",
@@ -659,7 +659,7 @@ function syncWindowAttrs(win) {
   applyThemeAttr(win.document);
   root.toggleAttribute("fe6-caption", getPref(PREF.caption, true));
   root.toggleAttribute("fe6-statusbar-hidden", !getPref(PREF.statusbar, true));
-  root.toggleAttribute("fe6-colored-status", getPref(PREF.coloredStatus, false));
+  root.toggleAttribute("fe6-color-pop", getPref(PREF.colorPop, false));
   root.toggleAttribute("fe6-show-appmenu", getPref(PREF.appMenu, false));
   const hist = win.document.getElementById("history-menu");
   if (hist) hist.hidden = !getPref(PREF.historyMenu, false);
@@ -863,7 +863,7 @@ function buildMenus(win) {
   relabel(doc, "menu_bookmarkThisPage", "Add to Favorites...", "A");
   relabel(doc, "bookmarksShowAll", "Organize Favorites...", "O");
 
-  // View > Status Bar, Colored Status Bar, Light/Dark Mode, Color Scheme
+  // View > Status Bar, Color Pop, Light/Dark Mode, Color Scheme
   const viewPopup = doc.getElementById("menu_viewPopup");
   if (viewPopup) {
     const sb = el(doc, "menuitem", { id: "fe6-statusbar-item", type: "checkbox", label: "Status Bar", accesskey: "B" });
@@ -879,11 +879,11 @@ function buildMenus(win) {
       const cur = getPref(PREF.scheme, "light");
       for (const mi of popup.children) setChecked(mi, mi.getAttribute("value") === cur);
     });
-    const csb = el(doc, "menuitem", { id: "fe6-colored-status-item", type: "checkbox", label: "Colored Status Bar", accesskey: "o" });
-    csb.addEventListener("command", () => Services.prefs.setBoolPref(PREF.coloredStatus, !getPref(PREF.coloredStatus, false)));
+    const csb = el(doc, "menuitem", { id: "fe6-color-pop-item", type: "checkbox", label: "Color Pop", accesskey: "o" });
+    csb.addEventListener("command", () => Services.prefs.setBoolPref(PREF.colorPop, !getPref(PREF.colorPop, false)));
     viewPopup.addEventListener("popupshowing", () => {
       setChecked(sb, getPref(PREF.statusbar, true));
-      setChecked(csb, getPref(PREF.coloredStatus, false));
+      setChecked(csb, getPref(PREF.colorPop, false));
     });
     const schemeMenu = el(doc, "menu", { id: "fe6-scheme-menu", label: "Light/Dark Mode", accesskey: "M" }, [popup]);
 
@@ -1034,7 +1034,7 @@ function injectPreferences(win) {
     box.append(h, desc, rg, themeRow, themeDesc,
       cb("Show the Windows 98 title bar (turn off to use your desktop's own)", PREF.caption, true),
       cb("Show the status bar", PREF.statusbar, true),
-      cb("Colored status bar (the status bar and window frame take the colour scheme's colour)", PREF.coloredStatus, false),
+      cb("Color Pop (the window edges, status bar and page frame take the colour scheme's colour)", PREF.colorPop, false),
       cb("Show the History menu", PREF.historyMenu, false));
     anchor.before(box);
     const sync = () => { box.hidden = !/^#?(general)?$/.test(win.location.hash || ""); };
@@ -1189,6 +1189,13 @@ export const FoxExplorer6 = {
   init() {
     if (started) return;
     started = true;
+    // "Colored status bar" was renamed Color Pop: carry the old setting over once
+    try {
+      if (Services.prefs.prefHasUserValue("foxexplorer.coloredStatusBar")) {
+        Services.prefs.setBoolPref(PREF.colorPop, Services.prefs.getBoolPref("foxexplorer.coloredStatusBar"));
+        Services.prefs.clearUserPref("foxexplorer.coloredStatusBar");
+      }
+    } catch (e) {}
     applyGlobalScheme();
     registerGlobalSheets();
 

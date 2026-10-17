@@ -1038,32 +1038,39 @@ sidebar-main, #sidebar-main {
 #TabsToolbar :is(#tabs-newtab-button, #new-tab-button, .tabs-newtab-button) > .toolbarbutton-icon { filter: var(--fe-cold-filter); }
 #TabsToolbar :is(#tabs-newtab-button, #new-tab-button, .tabs-newtab-button):not([disabled]):is(:hover, [open]) > .toolbarbutton-icon { filter: none; }
 
-/* ===================================================================== Colored status bar
-   View › Colored Status Bar: the status bar and the window frame take the colour scheme's
-   colour (plain Cathode: Cathode blue). The bevels become light/dark tints of that colour, and
+/* ===================================================================== Color Pop
+   View › Color Pop: the window edges, the status bar and the frame round the page take the
+   colour scheme's colour (plain Cathode: Cathode blue). The bevels become light/dark tints of that colour, and
    the progress blocks turn white so they show up on it. */
-:root[fe6-colored-status] {
+:root[fe6-color-pop] {
   --fe-cs-hi: rgba(255, 255, 255, .45);
   --fe-cs-lo: rgba(0, 0, 0, .45);
 }
-:root[fe6-colored-status] #fe6-statusbar {
+:root[fe6-color-pop] #fe6-statusbar {
   background: var(--fe-accent, var(--fe-sel)) !important;
   border-top-color: var(--fe-accent, var(--fe-sel)) !important;
   color: #ffffff !important;
 }
-:root[fe6-colored-status] #fe6-statusbar label { color: #ffffff !important; }
-:root[fe6-colored-status] .fe6-pane { box-shadow: inset -1px -1px var(--fe-cs-hi), inset 1px 1px var(--fe-cs-lo) !important; }
-:root[fe6-colored-status] #fe6-status-progress { background: rgba(0, 0, 0, .25); }
-:root[fe6-colored-status] #fe6-status-meter {
+:root[fe6-color-pop] #fe6-statusbar label { color: #ffffff !important; }
+:root[fe6-color-pop] .fe6-pane { box-shadow: inset -1px -1px var(--fe-cs-hi), inset 1px 1px var(--fe-cs-lo) !important; }
+:root[fe6-color-pop] #fe6-status-progress { background: rgba(0, 0, 0, .25); }
+:root[fe6-color-pop] #fe6-status-meter {
   background: repeating-linear-gradient(to right, #ffffff 0 8px, transparent 8px 10px) !important;
 }
-:root[fe6-colored-status] #fe6-status-grip {
+:root[fe6-color-pop] #fe6-status-grip {
   background: linear-gradient(135deg,
     transparent 0 45%, var(--fe-cs-hi) 45% 50%, var(--fe-cs-lo) 50% 60%, transparent 60% 65%,
     var(--fe-cs-hi) 65% 70%, var(--fe-cs-lo) 70% 80%, transparent 80% 85%,
     var(--fe-cs-hi) 85% 90%, var(--fe-cs-lo) 90% 100%) !important;
 }
-/* and a frame of the colour runs all the way round the window (see "window frame" below) */
+/* and a frame of the colour runs all the way round the window (see "window frame" below),
+   right up to the edge of the page itself */
+:root[fe6-color-pop] #tabbrowser-tabbox { background: var(--fe-accent, var(--fe-sel)) !important; padding: 0 !important; }
+:root[fe6-color-pop] :is(#tabbrowser-tabpanels, #tabbrowser-tabbox > tabpanels) {
+  background: var(--fe-accent, var(--fe-sel)) !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
 
 /* ===================================================================== window frame
    Firefox's Linux theme clips the window to the GTK title bar's rounded corners when it isn't
@@ -1085,16 +1092,16 @@ sidebar-main, #sidebar-main {
   padding: 4px !important;
 }
 
-/* Colored status bar: the frame round the whole window is the scheme colour. Windowed, it sits
-   inside the Win98 bevel; maximised, it's a 3px band round the edge of the screen. */
-:root[fe6-colored-status] body {
+/* Color Pop: the scheme colour is the window's edge, all the way round: 4px windowed, a 3px band
+   round the screen when maximised. */
+:root[fe6-color-pop] body {
   padding: 3px !important;
   box-shadow: inset 0 0 0 3px var(--fe-accent, var(--fe-sel)) !important;
 }
-:root[fe6-colored-status]:is([customtitlebar], [tabsintitlebar])[fe6-caption][sizemode="normal"] body {
-  padding: 5px !important;
-  box-shadow: var(--fe-raised), inset 0 0 0 5px var(--fe-accent, var(--fe-sel)) !important;
+:root[fe6-color-pop]:is([customtitlebar], [tabsintitlebar])[fe6-caption][sizemode="normal"] body {
+  padding: 4px !important;
+  box-shadow: inset 0 0 0 4px var(--fe-accent, var(--fe-sel)) !important;
 }
-:root[fe6-colored-status]:is([inFullscreen], [inDOMFullscreen]) body { padding: 0 !important; box-shadow: none !important; }
+:root[fe6-color-pop]:is([inFullscreen], [inDOMFullscreen]) body { padding: 0 !important; box-shadow: none !important; }
 /* the caption bar's own margin would leave a gray gap between it and the coloured frame */
-:root[fe6-colored-status] #fe6-caption { margin: 0 0 1px !important; }
+:root[fe6-color-pop] #fe6-caption { margin: 0 0 1px !important; }

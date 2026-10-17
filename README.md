@@ -32,7 +32,8 @@ every modern setting work as normal. Only the look changes:
   windows. The colour schemes add their colour as accents: the title bar, a stripe on the selected
   tab, the open menu, the logo box, selections, hot-tracked buttons, links, progress bars and the
   sidebar header.
-- **Colored status bar** (optional): the status bar and the window frame take the scheme's colour.
+- **Color Pop** (optional): the window's edges, the status bar and the frame round the page take
+  the scheme's colour.
 - **Light/Dark mode:** every scheme comes in light and dark (Cathode's dark grays), or
   **Use System Setting** to follow your desktop. Websites that support dark mode follow it.
 - **Downloads:** while a file downloads, the Downloads button plays a Windows 98 style animation
@@ -41,11 +42,11 @@ every modern setting work as normal. Only the look changes:
 | Cathode Color | Cathode Teal, dark |
 |---|---|
 | ![Cathode Color](docs/screenshots/cathode-light.png) | ![Cathode Teal in dark mode](docs/screenshots/cathode-teal-dark.png) |
-| **Cathode Brick, colored status bar** | **Cathode, dark** |
-| ![Cathode Brick with the colored status bar](docs/screenshots/cathode-brick-colored.png) | ![Cathode in dark mode](docs/screenshots/dark-start.png) |
+| **Cathode Brick with Color Pop** | **Cathode, dark** |
+| ![Cathode Brick with Color Pop](docs/screenshots/cathode-brick-colored.png) | ![Cathode in dark mode](docs/screenshots/dark-start.png) |
 
 Pick a colour scheme from **View › Color Scheme**, light or dark from **View › Light/Dark Mode**,
-and turn on **View › Colored Status Bar** if you like. All three are also in **Tools › Internet
+and turn on **View › Color Pop** if you like. All three are also in **Tools › Internet
 Options** (the *Fox Explorer 6* section at the top of General). Fox Explorer doesn't follow your
 KDE colour scheme by itself: choose the matching one once and it stays.
 
@@ -142,7 +143,7 @@ All of these are in **about:config**, and most are also in **Tools › Internet 
 |---|---|---|
 | `foxexplorer.colorScheme` | `light` | Light/Dark mode: `light`, `dark` or `system` |
 | `foxexplorer.theme` | `classic` | Colour scheme: `classic` (Cathode) or `cathode`, `brick`, `pumpkin`, `wheat`, `ember`, `spruce`, `meadow`, `marine`, `teal`, `plum`, `eggplant`, `rose`, `storm`, `slate`, `spectrum`, `sunset` (`cathode` is Cathode Color) |
-| `foxexplorer.coloredStatusBar` | `false` | also **View › Colored Status Bar** |
+| `foxexplorer.colorPop` | `false` | also **View › Color Pop** |
 | `foxexplorer.classicTitlebar` | `true` | Win98 caption bar; `false` hands the title bar back to your desktop |
 | `foxexplorer.statusBar` | `true` | also **View › Status Bar** |
 | `foxexplorer.showHistoryMenu` | `false` | IE6 had no History menu; turn Firefox's back on |
@@ -167,6 +168,11 @@ Your own `userChrome.css` still works on top (`toolkit.legacyUserProfileCustomiz
   Wayland and on compositing X11 desktops. Where it isn't available, Fox Explorer falls back to
   your desktop's normal title bar automatically. On the Cathode desktop you can also untick
   *Show the Windows 98 title bar* in Internet Options to get KDE's own Cathode window decoration.
+- **Square windows:** with its own title bar, Firefox lets GTK draw a frame round the window from
+  your GTK theme (rounded corners and a shadow with Breeze, a beige bevel with Chicago95). The
+  `foxexplorer6` launcher gives Fox Explorer a small GTK theme of its own, made from your current
+  one minus that frame, so the window's edge is Fox Explorer's own Win98 (or Color Pop) frame.
+  Other apps aren't affected. Set `FE6_KEEP_GTK_FRAME=1` to keep the GTK frame.
 - The quick build uses Mozilla's official binary, so Mozilla's telemetry defaults apply. You can
   turn them off under **Internet Options › Privacy & Security**. Source builds made with unofficial
   branding don't send telemetry.
