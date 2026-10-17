@@ -73,6 +73,20 @@ Then open **Fox Explorer 6** from your app grid, or run `foxexplorer6`.
 Options: `--channel esr` (Firefox ESR instead of release), `--version 158.0.1`, `--lang de`,
 `--from firefox-158.0.1.tar.xz` (use a tarball you already downloaded).
 
+### AppImage (any Linux, nothing to install)
+
+```bash
+scripts/build-repack.sh --appimage            # makes dist/FoxExplorer6-VERSION-x86_64.AppImage
+chmod +x dist/FoxExplorer6-*.AppImage && ./dist/FoxExplorer6-*.AppImage
+```
+
+The AppImage uses the same profile as the installed version (`~/.mozilla/foxexplorer6`).
+`--rpm --appimage` builds both at once.
+
+**Releases on GitHub:** the *Build release* workflow (Actions tab › *Build release* › *Run
+workflow*) builds the AppImage, the RPM and the tarball from the latest Firefox on GitHub's
+servers and publishes them as a release named after the Firefox version.
+
 ### Other distributions
 
 `scripts/build-repack.sh` (without `--rpm`) produces `dist/foxexplorer6-VERSION-ARCH.tar.xz`. Unpack it anywhere, then:

@@ -1,0 +1,62 @@
+# Builds Fox Explorer 6 from the latest official Firefox release (checked against Mozilla's
+# SHA-512 and GPG signature) and publishes the AppImage, the Fedora RPM and the tarball as a
+# GitHub release named after the Firefox version.
+#
+# Run it from the Actions tab: "Build release" > "Run workflow". To build automatically when
+# Firefox updates, uncomment the schedule below.
+name: Build release
+
+on:
+  workflow_dispatch:
+    inputs:
+      firefox_version:
+        description: "Firefox version (leave empty for the latest release)"
+        required: false
+        default: ""
+  # schedule:
+  #   - cron: "17 6 * * 2"   # every Tuesday; skips versions that already have a release
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+      - name: Tools
+        run: dnf -y install git python3 curl xz tar gnupg2 rpm-build file findutils gh which
+
+      - uses: actions/checkout@v4
+
+      - name: Build tarball, RPM and AppImage
+        run: |
+          git config --global --add safe.directory "$PWD"
+          V="${{ github.event.inputs.firefox_version }}"
+          if [ -n "$V" ]; then
+            scripts/build-repack.sh --rpm --appimage --version "$V"
+          else
+            scripts/build-repack.sh --rpm --appimage
+          fi
+          ls -la dist
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="$(ls dist/foxexplorer6-*.tar.xz | sed -E 's|.*/foxexplorer6-(.+)-[^-]+\.tar\.xz|\1|')"
+          TAG="v$VERSION"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; uploading (replacing) its files"
+            gh release upload "$TAG" dist/* --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" dist/* --repo "$GITHUB_REPOSITORY" \
+              --title "Fox Explorer 6 (Firefox $VERSION)" \
+              --notes "Fox Explorer 6 built on Firefox $VERSION.
+
+          - **AppImage** (any Linux): download, \`chmod +x\` it, run it.
+          - **Fedora RPM**: \`sudo dnf install ./foxexplorer6-*.rpm\`
+          - **Tarball** (other distributions): unpack and run \`foxexplorer6/foxexplorer/install.sh\`.
+
+          Built from the official Firefox $VERSION release, verified against Mozilla's SHA-512 and GPG signature."
+          fi

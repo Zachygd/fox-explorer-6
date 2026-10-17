@@ -11,10 +11,10 @@
 #
 # Usage:
 #   scripts/build-repack.sh [--channel release|esr] [--version 158.0.1] [--lang en-US]
-#                           [--from firefox-xxx.tar.xz|DIR] [--rpm] [--no-gpg]
+#                           [--from firefox-xxx.tar.xz|DIR] [--rpm] [--appimage] [--no-gpg]
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CHANNEL=release; VERSION=latest; LANG_CODE=en-US; FROM=""; RPM=0; GPG=1
+CHANNEL=release; VERSION=latest; LANG_CODE=en-US; FROM=""; RPM=0; APPIMAGE=0; GPG=1
 while [ $# -gt 0 ]; do
   case "$1" in
     --channel) CHANNEL="$2"; shift 2;;
@@ -22,6 +22,7 @@ while [ $# -gt 0 ]; do
     --lang) LANG_CODE="$2"; shift 2;;
     --from) FROM="$2"; shift 2;;
     --rpm) RPM=1; shift;;
+    --appimage) APPIMAGE=1; shift;;
     --no-gpg) GPG=0; shift;;
     -h|--help) sed -n 2,14p "$0"; exit 0;;
     *) echo "unknown option: $1" >&2; exit 2;;
@@ -105,5 +106,8 @@ echo "    $TARBALL_OUT"
 
 if [ "$RPM" = 1 ]; then
   "$HERE/scripts/build-rpm.sh" "$TARBALL_OUT" "$VERSION"
+fi
+if [ "$APPIMAGE" = 1 ]; then
+  "$HERE/scripts/build-appimage.sh" "$TARBALL_OUT"
 fi
 echo "Done."
