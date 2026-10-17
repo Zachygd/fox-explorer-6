@@ -813,10 +813,9 @@ menupopup menuitem[type="radio"][checked="true"] > .menu-check { list-style-imag
 /* ===================================================================== Links bar » button */
 #PlacesChevron {
   appearance: none !important;
+  /* a plain black » (white-ish in dark mode): no context-fill, so other toolbar rules can't
+     leave it without a colour */
   list-style-image: url("icons/chevron.svg") !important;
-  -moz-context-properties: fill, stroke !important;
-  fill: var(--fe-text) !important;
-  stroke: var(--fe-text) !important;
   background: transparent !important;
   box-shadow: none !important;
   border: 0 !important;
@@ -825,10 +824,13 @@ menupopup menuitem[type="radio"][checked="true"] > .menu-check { list-style-imag
   margin: 0 !important;
 }
 #PlacesChevron > .toolbarbutton-icon {
+  list-style-image: inherit !important;
+  filter: none !important; opacity: 1 !important; visibility: visible !important;
   width: 16px !important; height: 16px !important; padding: 0 !important;
   background: transparent !important; box-shadow: none !important; border-radius: 0 !important;
 }
 #PlacesChevron:hover { box-shadow: var(--fe-thin-raised) !important; }
+:root[fe6-scheme="dark"] #PlacesChevron { list-style-image: url("icons/chevron-dark.svg") !important; }
 #PlacesChevron:is([open], :hover:active) { box-shadow: var(--fe-thin-sunken) !important; }
 
 /* ===================================================================== icons for every

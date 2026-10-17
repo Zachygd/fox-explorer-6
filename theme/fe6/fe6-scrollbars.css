@@ -23,8 +23,8 @@ scrollbar thumb {
   border-radius: 0 !important;
   box-shadow: inset -1px -1px var(--fe-sb-dark), inset 1px 1px var(--fe-sb-light), inset -2px -2px var(--fe-sb-shadow), inset 2px 2px var(--fe-sb-hi) !important;
 }
-scrollbar:not([orient="horizontal"]) thumb { min-height: 8px !important; }
-scrollbar[orient="horizontal"] thumb { min-width: 8px !important; }
+scrollbar:not([orient="horizontal"], :not([orient], [vertical])) thumb { min-height: 8px !important; }
+scrollbar:is([orient="horizontal"], :not([orient], [vertical])) thumb { min-width: 8px !important; }
 scrollbar > scrollbarbutton {
   display: flex !important;        /* Win10-style scroll bars hide the arrows until hover */
   visibility: visible !important;
@@ -42,6 +42,9 @@ scrollbar > scrollbarbutton:hover:active, scrollbar > scrollbarbutton[active="tr
 }
 scrollcorner { background: var(--fe-sb-face) !important; }
 
+/* Horizontal vs vertical: Firefox up to ~150 marks the horizontal bar orient="horizontal";
+   newer Firefox only marks the vertical one, vertical="true". These selectors handle both. */
+
 /* Win98 has one arrow at each end: hide the extra inner pair */
 scrollbar > scrollbarbutton:is([sbattr="scrollbar-down-top"], [sbattr="scrollbar-up-bottom"]) {
   display: none !important;
@@ -49,19 +52,19 @@ scrollbar > scrollbarbutton:is([sbattr="scrollbar-down-top"], [sbattr="scrollbar
 
 /* arrows: drawn as small solid triangles with cone gradients (image URLs aren't painted on
    scroll bar buttons) */
-scrollbar:not([orient="horizontal"]) > scrollbarbutton[sbattr="scrollbar-up-top"] {
+scrollbar:not([orient="horizontal"], :not([orient], [vertical])) > scrollbarbutton[sbattr="scrollbar-up-top"] {
   background-image: conic-gradient(from 135deg at 50% 0%, var(--fe-sb-arrow) 90deg, transparent 90deg) !important;
   background-size: 8px 4px !important;
 }
-scrollbar:not([orient="horizontal"]) > scrollbarbutton[sbattr="scrollbar-down-bottom"] {
+scrollbar:not([orient="horizontal"], :not([orient], [vertical])) > scrollbarbutton[sbattr="scrollbar-down-bottom"] {
   background-image: conic-gradient(from -45deg at 50% 100%, var(--fe-sb-arrow) 90deg, transparent 90deg) !important;
   background-size: 8px 4px !important;
 }
-scrollbar[orient="horizontal"] > scrollbarbutton[sbattr="scrollbar-up-top"] {
+scrollbar:is([orient="horizontal"], :not([orient], [vertical])) > scrollbarbutton[sbattr="scrollbar-up-top"] {
   background-image: conic-gradient(from 45deg at 0% 50%, var(--fe-sb-arrow) 90deg, transparent 90deg) !important;
   background-size: 4px 8px !important;
 }
-scrollbar[orient="horizontal"] > scrollbarbutton[sbattr="scrollbar-down-bottom"] {
+scrollbar:is([orient="horizontal"], :not([orient], [vertical])) > scrollbarbutton[sbattr="scrollbar-down-bottom"] {
   background-image: conic-gradient(from 225deg at 100% 50%, var(--fe-sb-arrow) 90deg, transparent 90deg) !important;
   background-size: 4px 8px !important;
 }
