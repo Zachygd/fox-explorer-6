@@ -27,6 +27,9 @@ const CHROME_DOC_PREFIXES = [
 const SE98_CSS_URI = "resource://fe6/se98/se98.css";
 // Cathode colour themes (art/make_themes.py, from the Cathode KDE theme)
 const THEMES_CSS_URI = "resource://fe6/fe6-themes.css";
+// Windows XP style (View > Windows XP Style), applies only with <html fe6-xp>
+const XP_CSS_URI = "resource://fe6/fe6-xp.css";
+const XP_ICONS_CSS_URI = "resource://fe6/xp/xp-icons.css";   // Windows XP High Resolution Icon Pack (CC0)
 // GENERATED THEMES (art/make_themes.py) - don't edit by hand
 const THEMES = [
  {
@@ -195,6 +198,7 @@ const PREF = {
   scheme: "foxexplorer.colorScheme",       // "light" | "dark" | "system"
   theme: "foxexplorer.theme",              // "classic" (plain Cathode) or a Cathode colour scheme id
   statusbar: "foxexplorer.statusBar",      // bool
+  style: "foxexplorer.windowsStyle",       // "98" (Windows 98) or "xp" (Windows XP)
   colorPop: "foxexplorer.colorPop",        // bool: Color Pop - window edges, status bar and page frame in the scheme colour
   caption: "foxexplorer.classicTitlebar",  // bool: draw the Win98 title bar
   historyMenu: "foxexplorer.showHistoryMenu",
@@ -302,6 +306,10 @@ function themeLabel(t) {
 }
 const BASE_LABEL = "Cathode";   // "classic": Cathode's standard colours, without accents
 
+function isXP() {
+  return getPref(PREF.style, "98") === "xp";
+}
+
 function setTheme(value) {
   Services.prefs.setStringPref(PREF.theme, value);
 }
@@ -331,6 +339,7 @@ function applyThemeAttr(doc) {
   const t = currentTheme();
   if (t === "classic") root.removeAttribute("fe6-theme");
   else root.setAttribute("fe6-theme", t);
+  root.toggleAttribute("fe6-xp", isXP());
 }
 
 /* every themed document: browser windows, their sidebars, the Library and dialogs */
@@ -859,7 +868,7 @@ function themeSidebarTools(win) {
   let tools = null;
   try { tools = SC.toolsAndExtensions; } catch (e) {}
   for (const [id, name] of Object.entries(SIDEBAR_ICONS)) {
-    const url = "resource://fe6/se98/" + name + "-16.png";
+    const url = "resource://fe6/" + (isXP() ? "xp/" : "se98/") + name + "-16.png";
     for (const entry of [SC.sidebars.get?.(id), tools?.get?.(id)]) {
       if (entry && entry.iconUrl !== url) {
         entry.iconUrl = url;
@@ -914,9 +923,12 @@ function buildMenus(win) {
     });
     const csb = el(doc, "menuitem", { id: "fe6-color-pop-item", type: "checkbox", label: "Color Pop", accesskey: "o" });
     csb.addEventListener("command", () => Services.prefs.setBoolPref(PREF.colorPop, !getPref(PREF.colorPop, false)));
+    const xpi = el(doc, "menuitem", { id: "fe6-xp-item", type: "checkbox", label: "Windows XP Style", accesskey: "X" });
+    xpi.addEventListener("command", () => Services.prefs.setStringPref(PREF.style, isXP() ? "98" : "xp"));
     viewPopup.addEventListener("popupshowing", () => {
       setChecked(sb, getPref(PREF.statusbar, true));
       setChecked(csb, getPref(PREF.colorPop, false));
+      setChecked(xpi, isXP());
     });
     const schemeMenu = el(doc, "menu", { id: "fe6-scheme-menu", label: "Light/Dark Mode", accesskey: "M" }, [popup]);
 
@@ -941,8 +953,9 @@ function buildMenus(win) {
       sb.after(csb);
       csb.after(schemeMenu);
       schemeMenu.after(themeMenu);
+      themeMenu.after(xpi);
     } else {
-      viewPopup.prepend(sb, csb, schemeMenu, themeMenu);
+      viewPopup.prepend(sb, csb, schemeMenu, themeMenu, xpi);
     }
   }
 
@@ -1001,6 +1014,8 @@ function injectSheet(win) {
     }
     win.windowUtils.loadSheetUsingURIString(SE98_CSS_URI, win.windowUtils.AUTHOR_SHEET);
     win.windowUtils.loadSheetUsingURIString(THEMES_CSS_URI, win.windowUtils.AUTHOR_SHEET);
+    win.windowUtils.loadSheetUsingURIString(XP_CSS_URI, win.windowUtils.AUTHOR_SHEET);
+    win.windowUtils.loadSheetUsingURIString(XP_ICONS_CSS_URI, win.windowUtils.AUTHOR_SHEET);
     win.document.documentElement?.setAttribute("fe6-scheme", effectiveScheme(win));
     win.document.documentElement?.setAttribute("fe6-themed", "true");
     applyThemeAttr(win.document);
@@ -1043,17 +1058,32 @@ function injectPreferences(win) {
     ml.value = currentTheme();
     ml.addEventListener("command", () => setTheme(ml.value));
     // keep the page in step when the scheme or theme is changed from the View menu
-    const follow = { observe() { ml.value = currentTheme(); rg.value = getPref(PREF.scheme, "light"); } };
+    const follow = { observe() { ml.value = currentTheme(); rg.value = getPref(PREF.scheme, "light"); sml.value = isXP() ? "xp" : "98"; } };
     Services.prefs.addObserver(PREF.theme, follow);
     Services.prefs.addObserver(PREF.scheme, follow);
+    Services.prefs.addObserver(PREF.style, follow);
     win.addEventListener("unload", () => {
       Services.prefs.removeObserver(PREF.theme, follow);
       Services.prefs.removeObserver(PREF.scheme, follow);
+      Services.prefs.removeObserver(PREF.style, follow);
     }, { once: true });
     const themeDesc = doc.createXULElement("description");
     themeDesc.className = "description-deemphasized";
     themeDesc.textContent = "The colour schemes match the Cathode desktop for KDE Plasma: the same grays as the taskbar, with the scheme's colour in the title bar, selections, tabs, menus and progress bars. Each one works in light and dark mode.";
     themeRow.append(tl, ml);
+    const styleRow = doc.createXULElement("hbox");
+    styleRow.setAttribute("align", "center");
+    const sl = doc.createXULElement("label");
+    sl.setAttribute("value", "Window style:");
+    sl.setAttribute("control", "fe6-style-list");
+    const sml = doc.createXULElement("menulist");
+    sml.id = "fe6-style-list";
+    const smp = doc.createXULElement("menupopup");
+    smp.append(opt("98", "Windows 98"), opt("xp", "Windows XP"));
+    sml.append(smp);
+    sml.value = isXP() ? "xp" : "98";
+    sml.addEventListener("command", () => Services.prefs.setStringPref(PREF.style, sml.value));
+    styleRow.append(sl, sml);
     const cb = (label, pref, def) => {
       const c = doc.createXULElement("checkbox");
       c.setAttribute("label", label);
@@ -1064,7 +1094,7 @@ function injectPreferences(win) {
     const box = doc.createXULElement("groupbox");
     box.id = "fe6-prefs";
     box.setAttribute("data-category", "paneGeneral");
-    box.append(h, desc, rg, themeRow, themeDesc,
+    box.append(h, desc, rg, themeRow, themeDesc, styleRow,
       cb("Show the Windows 98 title bar (turn off to use your desktop's own)", PREF.caption, true),
       cb("Show the status bar", PREF.statusbar, true),
       cb("Color Pop (the window edges, status bar and page frame take the colour scheme's colour)", PREF.colorPop, false),
@@ -1109,6 +1139,53 @@ function registerGlobalSheets() {
     console.error("[Fox Explorer 6] scroll bar sheet failed", e);
   }
   registerStartPageTheme();
+  registerXPScrollbars();
+}
+
+/* Windows XP scroll bars (web pages and the browser alike): rounded, softly shaded thumb and
+   arrow buttons tinted with the colour scheme, like XP's Luna scroll bars. Built here because
+   the colour depends on the scheme; registered app-wide on top of fe6-scrollbars.css. */
+let xpScrollURI = null;
+function registerXPScrollbars() {
+  try {
+    const sss = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService);
+    if (xpScrollURI && sss.sheetRegistered(xpScrollURI, sss.AGENT_SHEET)) sss.unregisterSheet(xpScrollURI, sss.AGENT_SHEET);
+    xpScrollURI = null;
+    if (!isXP()) return;
+    const id = currentTheme() === "classic" ? "cathode" : currentTheme();
+    const a = THEMES.find(x => x.id === id)?.sel || "#064ed8";
+    const H = 'scrollbar:is([orient="horizontal"], :not([orient], [vertical]))';
+    const V = 'scrollbar:not([orient="horizontal"], :not([orient], [vertical]))';
+    const vars = dark => dark
+      ? `--xp-track:#2e2d29;--xp-a:color-mix(in srgb, ${a} 38%, #3b3a35);--xp-b:color-mix(in srgb, ${a} 55%, #3b3a35);` +
+        `--xp-edge:color-mix(in srgb, ${a} 70%, #000);--xp-hi:rgba(255,255,255,.16);--fe-sb-arrow:#e8e8e8;`
+      : `--xp-track:#f4f4f0;--xp-a:color-mix(in srgb, ${a} 14%, #fff);--xp-b:color-mix(in srgb, ${a} 30%, #fff);` +
+        `--xp-edge:color-mix(in srgb, ${a} 55%, #fff);--xp-hi:rgba(255,255,255,.75);--fe-sb-arrow:color-mix(in srgb, ${a} 70%, #000);`;
+    const scheme = getPref(PREF.scheme, "light");
+    const block = scheme === "dark" ? `scrollbar, scrollcorner {${vars(true)}}`
+      : scheme === "system" ? `scrollbar, scrollcorner {${vars(false)}} @media (prefers-color-scheme: dark) { scrollbar, scrollcorner {${vars(true)}} }`
+      : `scrollbar, scrollcorner {${vars(false)}}`;
+    const css = `@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+${block}
+scrollbar slider { background: var(--xp-track) !important; }
+scrollcorner { background: var(--xp-track) !important; }
+scrollbar thumb, scrollbar > scrollbarbutton {
+  border-radius: 3px !important;
+  box-shadow: inset 0 0 0 1px var(--xp-edge), inset 1px 1px 0 1px var(--xp-hi) !important;
+  margin: 0 !important;
+}
+${V} thumb { background: linear-gradient(to right, var(--xp-a), var(--xp-b)) !important; }
+${H} thumb { background: linear-gradient(to bottom, var(--xp-a), var(--xp-b)) !important; }
+scrollbar > scrollbarbutton { background-color: var(--xp-a) !important; }
+scrollbar > scrollbarbutton:hover { background-color: var(--xp-b) !important; }
+scrollbar > scrollbarbutton:hover:active, scrollbar > scrollbarbutton[active="true"] {
+  background-color: var(--xp-edge) !important; box-shadow: inset 0 0 0 1px var(--xp-edge) !important;
+}`;
+    xpScrollURI = Services.io.newURI("data:text/css;charset=utf-8," + encodeURIComponent(css));
+    sss.loadAndRegisterSheet(xpScrollURI, sss.AGENT_SHEET);
+  } catch (e) {
+    console.error("[Fox Explorer 6] XP scroll bars failed", e);
+  }
 }
 
 /* The start page (resource://fe6/start.html) runs as a web page, so it can't see the window's
@@ -1125,10 +1202,16 @@ function registerStartPageTheme() {
     const id = currentTheme() === "classic" ? "cathode" : currentTheme();
     const t = THEMES.find(x => x.id === id);
     if (!t) return;
-    const light = `--face:#c0c0c0;--hi:#fff;--light:#dfdfdf;--shadow:#808080;--dark:#000;--text:#000;--window:#f4f3ef;` +
-                  `--link:${t.linkLight};--capgrad:${t.grad};--desk:${t.deskLight};`;
-    const dark = `--face:#3a3a3a;--hi:#686868;--light:#4a4a4a;--shadow:#242424;--dark:#000;--text:#e8e8e8;--window:#2a2a2a;` +
-                 `--link:${t.linkDark};--capgrad:${t.grad};--desk:${t.deskDark};`;
+    // Windows XP style: beige surfaces and the glossy Luna title bar
+    const xp = isXP();
+    const gloss = "linear-gradient(to bottom, rgba(255,255,255,.55) 0, rgba(255,255,255,.22) 2px, rgba(255,255,255,.08) 7px, transparent 45%, rgba(0,0,0,.1) 80%, rgba(0,0,0,.28) 100%), ";
+    const cap = (xp ? gloss : "") + t.grad;
+    const light = (xp ? `--face:#ece9d8;--hi:#fff;--light:#f3f1e7;--shadow:#aca899;--dark:#716f64;--text:#000;--window:#fff;`
+                      : `--face:#c0c0c0;--hi:#fff;--light:#dfdfdf;--shadow:#808080;--dark:#000;--text:#000;--window:#f4f3ef;`) +
+                  `--link:${t.linkLight};--capgrad:${cap};--desk:${t.deskLight};`;
+    const dark = (xp ? `--face:#3b3a35;--hi:#5e5c54;--light:#45443e;--shadow:#23221e;--dark:#000;--text:#e8e8e8;--window:#2a2a27;`
+                     : `--face:#3a3a3a;--hi:#686868;--light:#4a4a4a;--shadow:#242424;--dark:#000;--text:#e8e8e8;--window:#2a2a2a;`) +
+                 `--link:${t.linkDark};--capgrad:${cap};--desk:${t.deskDark};`;
     const imp = decl => decl.replace(/;/g, " !important;");   // user sheets lose to the page otherwise
     const css = `@-moz-document url-prefix("resource://fe6/start.html") {` +
                 `:root{${imp(light)}} @media (prefers-color-scheme: dark){:root{${imp(dark)}}} }`;
@@ -1245,6 +1328,8 @@ export const FoxExplorer6 = {
           win.windowUtils.loadSheetUsingURIString(CHROME_CSS_URI, win.windowUtils.AUTHOR_SHEET);
           win.windowUtils.loadSheetUsingURIString(SE98_CSS_URI, win.windowUtils.AUTHOR_SHEET);
           win.windowUtils.loadSheetUsingURIString(THEMES_CSS_URI, win.windowUtils.AUTHOR_SHEET);
+          win.windowUtils.loadSheetUsingURIString(XP_CSS_URI, win.windowUtils.AUTHOR_SHEET);
+          win.windowUtils.loadSheetUsingURIString(XP_ICONS_CSS_URI, win.windowUtils.AUTHOR_SHEET);
           win.windowUtils.loadSheetUsingURIString(AGENT_CSS_URI, win.windowUtils.AGENT_SHEET);
           doc.documentElement.setAttribute("fe6-themed", "true");
           applyThemeAttr(doc);
@@ -1280,7 +1365,12 @@ export const FoxExplorer6 = {
           registerGlobalSheets();
         }
         if (data === PREF.caption) syncTitlebarPref();
-        if (data === PREF.theme || data === PREF.scheme) {
+        if (data === PREF.style) {
+          for (const w of Services.wm.getEnumerator("navigator:browser")) {
+            try { themeSidebarTools(w); } catch (e) {}
+          }
+        }
+        if (data === PREF.theme || data === PREF.scheme || data === PREF.style) {
           syncAccentColor();
           registerGlobalSheets();
           applyThemeEverywhere();

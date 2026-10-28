@@ -38,6 +38,10 @@ every modern setting work as normal. Only the look changes:
   **Use System Setting** to follow your desktop. Websites that support dark mode follow it.
 - **No telemetry:** Mozilla's data collection, studies, sponsored content and background
   check-ins are switched off (see [Privacy](#privacy)).
+- **Windows XP style** (optional, **View › Windows XP Style**): Internet Explorer 6 as it looked
+  on Windows XP. You get beige toolbars, a glossy Luna title bar with rounded top corners and XP's
+  window buttons, rounded hot-tracking buttons, white menus, XP tabs, scroll bars and progress
+  bars, and XP icons. Every colour scheme, Light/Dark Mode and Color Pop work in it too.
 - **Downloads:** while a file downloads, the Downloads button plays a Windows 98 style animation
   (a page flying from the globe into the folder) with a small block progress bar under it.
 
@@ -51,6 +55,10 @@ Pick a colour scheme from **View › Color Scheme**, light or dark from **View �
 and turn on **View › Color Pop** if you like. All three are also in **Tools › Internet
 Options** (the *Fox Explorer 6* section at the top of General). Fox Explorer doesn't follow your
 KDE colour scheme by itself: choose the matching one once and it stays.
+
+| Windows XP style | Windows XP style, dark (Cathode Spruce) |
+|---|---|
+| ![Windows XP style](docs/screenshots/xp-light.png) | ![Windows XP style in dark mode](docs/screenshots/xp-dark-spruce.png) |
 
 | View › Color Scheme | Internet Options |
 |---|---|
@@ -149,6 +157,7 @@ and 1–3 hours.
 | [`scripts/make-appini.py`](scripts/make-appini.py) | Gives Fox Explorer its own profile (`~/.mozilla/foxexplorer6`) and window class, so it sits beside a normal Firefox without sharing anything. Internally the app is still named *Firefox*, so websites and addons.mozilla.org treat it as Firefox. |
 | [`art/`](art) | The app logo and the scripts that generate the icon set and branding sizes. |
 | [`theme/fe6/se98/`](theme/fe6/se98) | The SE98 icons by nestoris (GPL-2.0) and `se98.css`, which puts them on Firefox's buttons. Made by [`art/make_se98.py`](art/make_se98.py) from a clone of [Win98SE](https://github.com/nestoris/Win98SE); the Downloads animation by [`art/make_download_anim.py`](art/make_download_anim.py). |
+| [`theme/fe6/fe6-xp.css`](theme/fe6/fe6-xp.css), [`theme/fe6/xp/`](theme/fe6/xp) | The Windows XP style, and its icons made by [`art/make_xp_icons.py`](art/make_xp_icons.py) from the Windows XP High Resolution Icon Pack. |
 | [`theme/fe6/fe6-themes.css`](theme/fe6/fe6-themes.css) | The Cathode colour schemes (plain Cathode and every colour scheme), light and dark. Made by [`art/make_themes.py`](art/make_themes.py) from the Cathode KDE theme's colour table (`build/schemes.py`), so a new Cathode scheme is one re-run away. |
 
 ### Settings
@@ -160,6 +169,7 @@ All of these are in **about:config**, and most are also in **Tools › Internet 
 | `foxexplorer.colorScheme` | `light` | Light/Dark mode: `light`, `dark` or `system` |
 | `foxexplorer.theme` | `classic` | Colour scheme: `classic` (Cathode) or `cathode`, `brick`, `pumpkin`, `wheat`, `ember`, `spruce`, `meadow`, `marine`, `teal`, `plum`, `eggplant`, `rose`, `storm`, `slate`, `spectrum`, `sunset` (`cathode` is Cathode Color) |
 | `foxexplorer.colorPop` | `false` | also **View › Color Pop** |
+| `foxexplorer.windowsStyle` | `98` | `98` or `xp`; also **View › Windows XP Style** |
 | `foxexplorer.classicTitlebar` | `true` | Win98 caption bar; `false` hands the title bar back to your desktop |
 | `foxexplorer.statusBar` | `true` | also **View › Status Bar** |
 | `foxexplorer.showHistoryMenu` | `false` | IE6 had no History menu; turn Firefox's back on |
@@ -194,7 +204,11 @@ Your own `userChrome.css` still works on top (`toolkit.legacyUserProfileCustomiz
   trademark of the Mozilla Foundation, and Internet Explorer and Windows are trademarks of
   Microsoft. Released under the **MPL-2.0** ([LICENSE](LICENSE)), like Firefox. The SE98 icons in
   [`theme/fe6/se98/`](theme/fe6/se98) are by nestoris and stay under their own licence, the
-  **GPL-2.0** ([theme/fe6/se98/LICENSE](theme/fe6/se98/LICENSE)).
+  **GPL-2.0** ([theme/fe6/se98/LICENSE](theme/fe6/se98/LICENSE)). The Windows XP style's icons in
+  [`theme/fe6/xp/`](theme/fe6/xp) are from the *Windows XP High Resolution Icon Pack* by
+  [marchmountain](https://github.com/marchmountain/-Windows-XP-High-Resolution-Icon-Pack),
+  released under **CC0 1.0** ([theme/fe6/xp/LICENSE](theme/fe6/xp/LICENSE)). They're recreations
+  of Windows XP's icons, and Windows and Windows XP are trademarks of Microsoft.
 
 ### Privacy
 

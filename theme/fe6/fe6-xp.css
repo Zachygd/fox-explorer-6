@@ -1,0 +1,356 @@
+/* Fox Explorer 6 — Windows XP style (View › Windows XP Style).
+ *
+ * Internet Explorer 6 as it looked on Windows XP ("Luna"): beige toolbars, a glossy rounded title
+ * bar, rounded hot-tracking buttons, white menus, XP tabs and progress bars. Everything here only
+ * applies with <html fe6-xp>; the colour schemes (title bar, selections, accents, Color Pop) and
+ * Light/Dark Mode work the same as in the Windows 98 style. Loaded after fe6.css and
+ * fe6-themes.css, into the browser window and the chrome documents (sidebar, Library, dialogs).
+ */
+
+/* ===================================================================== XP surfaces */
+:root[fe6-xp] {
+  --fe-face: #ece9d8 !important;
+  --fe-light: #f3f1e7 !important;
+  --fe-hi: #ffffff !important;
+  --fe-shadow: #aca899 !important;
+  --fe-dark: #716f64 !important;
+  --fe-graytext: #aca899 !important;
+  --fe-window: #ffffff !important;
+  --fe-tip: #ffffe1 !important;
+  --fe-cold-filter: none !important;              /* IE6 on XP shows its icons in colour */
+  --fe-xp-bar: linear-gradient(to bottom, #fdfdfa 0%, #f3f1e8 45%, #ebe8d9 100%);
+  --fe-xp-border: #aca899;                         /* menus, panels, tabs */
+  --fe-xp-field: #7f9db9;                          /* text boxes */
+  --fe-xp-hot: linear-gradient(to bottom, #ffffff 0%, #f6f5f0 55%, #e8e5d8 100%);
+  --fe-xp-hot-edge: #cecab9;
+  --fe-xp-down: linear-gradient(to bottom, #e0ddd1 0%, #ebe9e0 100%);
+  --fe-xp-down-edge: #a7a392;
+  --fe-xp-tab: linear-gradient(to bottom, #ffffff 0%, #f6f5ef 70%, #ecebe4 100%);
+  --fe-xp-tab-edge: #919b9c;
+  --fe-xp-title-font: bold 13px "Trebuchet MS", "Tahoma", "Liberation Sans", sans-serif;
+  /* XP bevels are a single soft line */
+  --fe-raised: inset -1px -1px var(--fe-shadow), inset 1px 1px var(--fe-hi) !important;
+  --fe-pressed: inset 1px 1px var(--fe-shadow), inset -1px -1px var(--fe-hi) !important;
+  --fe-sunken: inset 0 0 0 1px var(--fe-xp-field) !important;
+  --fe-thin-raised: inset 0 0 0 1px var(--fe-xp-hot-edge) !important;
+  --fe-thin-sunken: inset 0 0 0 1px var(--fe-shadow) !important;
+  /* rebar gripper: a column of little raised dots */
+  --fe-gripper: repeating-linear-gradient(to bottom, var(--fe-hi) 0 1px, var(--fe-shadow) 1px 2px, transparent 2px 4px) !important;
+}
+:root[fe6-xp][fe6-scheme="dark"] {
+  --fe-face: #3b3a35 !important;
+  --fe-light: #45443e !important;
+  --fe-hi: #5e5c54 !important;
+  --fe-shadow: #23221e !important;
+  --fe-dark: #000000 !important;
+  --fe-graytext: #8e8b80 !important;
+  --fe-window: #2a2a27 !important;
+  --fe-tip: #30302a !important;
+  --fe-xp-bar: linear-gradient(to bottom, #4a4943 0%, #403f39 45%, #36352f 100%);
+  --fe-xp-border: #5e5c54;
+  --fe-xp-field: #56708f;
+  --fe-xp-hot: linear-gradient(to bottom, #5b5a52 0%, #4d4c45 55%, #43423c 100%);
+  --fe-xp-hot-edge: #6d6b61;
+  --fe-xp-down: linear-gradient(to bottom, #2e2d29 0%, #36352f 100%);
+  --fe-xp-down-edge: #23221e;
+  --fe-xp-tab: linear-gradient(to bottom, #4c4b45 0%, #42413b 70%, #3b3a35 100%);
+  --fe-xp-tab-edge: #6d6b61;
+}
+/* chrome documents (sidebar, Library, dialogs) follow the system scheme instead of fe6-scheme */
+@media (prefers-color-scheme: dark) {
+  :root[fe6-xp]:not([fe6-scheme]) {
+    --fe-face: #3b3a35 !important; --fe-light: #45443e !important; --fe-hi: #5e5c54 !important;
+    --fe-shadow: #23221e !important; --fe-dark: #000000 !important; --fe-graytext: #8e8b80 !important;
+    --fe-window: #2a2a27 !important; --fe-tip: #30302a !important;
+    --fe-xp-bar: linear-gradient(to bottom, #4a4943 0%, #403f39 45%, #36352f 100%);
+    --fe-xp-border: #5e5c54; --fe-xp-field: #56708f;
+    --fe-xp-hot: linear-gradient(to bottom, #5b5a52 0%, #4d4c45 55%, #43423c 100%); --fe-xp-hot-edge: #6d6b61;
+    --fe-xp-down: linear-gradient(to bottom, #2e2d29 0%, #36352f 100%); --fe-xp-down-edge: #23221e;
+    --fe-xp-tab: linear-gradient(to bottom, #4c4b45 0%, #42413b 70%, #3b3a35 100%); --fe-xp-tab-edge: #6d6b61;
+  }
+}
+:root[fe6-xp] {
+  /* the Luna title bar: the colour scheme's own title gradient, with XP's gloss on top */
+  --fe-xp-gloss: linear-gradient(to bottom, rgba(255, 255, 255, .55) 0, rgba(255, 255, 255, .22) 2px,
+                 rgba(255, 255, 255, .08) 7px, transparent 45%, rgba(0, 0, 0, .10) 80%, rgba(0, 0, 0, .28) 100%);
+  --fe-xp-caption: var(--fe-xp-gloss), var(--fe-cap-grad);
+}
+
+/* ===================================================================== toolbars (rebar bands) */
+:root[fe6-xp] #navigator-toolbox,
+:root[fe6-xp] #navigator-toolbox > toolbar,
+:root[fe6-xp] #titlebar > toolbar {
+  background-color: var(--fe-face) !important;
+}
+:root[fe6-xp] #navigator-toolbox > toolbar,
+:root[fe6-xp] #titlebar > toolbar {
+  background-image: var(--fe-gripper), var(--fe-xp-bar) !important;
+  background-position: 3px 4px, 0 0 !important;
+  background-size: 3px calc(100% - 8px), 100% 100% !important;
+  background-repeat: no-repeat !important;
+  box-shadow: inset 0 1px var(--fe-hi), inset 0 -1px var(--fe-shadow) !important;
+}
+:root[fe6-xp] #nav-bar {
+  background-image: var(--fe-gripper), var(--fe-gripper),
+                    linear-gradient(to bottom, transparent 40px, var(--fe-shadow) 40px 41px, var(--fe-hi) 41px 42px, transparent 42px),
+                    var(--fe-xp-bar) !important;
+  background-position: 3px 5px, 3px 45px, 0 0, 0 0 !important;
+  background-size: 3px 32px, 3px 18px, 100% 100%, 100% 100% !important;
+}
+:root[fe6-xp] #TabsToolbar {
+  background-image: var(--fe-gripper), linear-gradient(var(--fe-face), var(--fe-face)) !important;
+  background-position: 3px 6px, 0 0 !important;
+  background-size: 3px calc(100% - 12px), 100% 100% !important;
+  box-shadow: inset 0 1px var(--fe-hi), inset 0 -1px var(--fe-xp-tab-edge) !important;
+}
+
+/* hot-tracked buttons: a soft rounded box, pressed in when clicked */
+:root[fe6-xp] #nav-bar .toolbarbutton-1,
+:root[fe6-xp] #PersonalToolbar toolbarbutton,
+:root[fe6-xp] #fe6-go-button {
+  border-radius: 3px !important;
+}
+:root[fe6-xp] #nav-bar .toolbarbutton-1:not([disabled]):hover,
+:root[fe6-xp] #PersonalToolbar toolbarbutton:not([disabled]):hover,
+:root[fe6-xp] #fe6-go-button:not([disabled]):hover {
+  background: var(--fe-xp-hot) !important;
+  box-shadow: inset 0 0 0 1px var(--fe-xp-hot-edge) !important;
+}
+:root[fe6-xp] #nav-bar .toolbarbutton-1:not([disabled]):is(:hover:active, [open], [checked]),
+:root[fe6-xp] #PersonalToolbar toolbarbutton:not([disabled]):is(:hover:active, [open]),
+:root[fe6-xp] #fe6-go-button:not([disabled]):hover:active {
+  background: var(--fe-xp-down) !important;
+  box-shadow: inset 0 0 0 1px var(--fe-xp-down-edge), inset 1px 1px 2px rgba(0, 0, 0, .12) !important;
+}
+:root[fe6-xp] #nav-bar .toolbarbutton-1[checked]:not(:hover) { background: var(--fe-xp-down) !important; }
+:root[fe6-xp] #nav-bar .toolbarbutton-1 .toolbarbutton-icon { filter: none; }
+:root[fe6-xp] #nav-bar .toolbarbutton-1[disabled] .toolbarbutton-icon { filter: grayscale(1) opacity(.5) !important; }
+:root[fe6-xp] #nav-bar toolbarseparator,
+:root[fe6-xp] #nav-bar .customizableui-special-separator {
+  height: 26px !important;
+  background: linear-gradient(to right, var(--fe-shadow) 0 1px, var(--fe-hi) 1px 2px) !important;
+}
+
+/* Address field: XP's blue-gray text box border */
+:root[fe6-xp] #urlbar :is(#urlbar-background, .urlbar-background),
+:root[fe6-xp] #urlbar:is([focused], [open]) :is(#urlbar-background, .urlbar-background) {
+  box-shadow: inset 0 0 0 1px var(--fe-xp-field) !important;
+}
+:root[fe6-xp][fe6-theme] #urlbar[focused] :is(#urlbar-background, .urlbar-background) {
+  box-shadow: inset 0 0 0 1px var(--fe-accent), inset 0 0 0 2px color-mix(in srgb, var(--fe-accent) 30%, transparent) !important;
+}
+:root[fe6-xp] .urlbarView { border-color: var(--fe-xp-field) !important; }
+
+/* ===================================================================== Luna title bar */
+:root[fe6-xp] #fe6-caption {
+  height: 26px;
+  margin: 0 !important;
+  padding: 0 4px 0 6px;
+  background: var(--fe-xp-caption) !important;
+  border-radius: 0;
+  box-shadow: inset 0 -1px rgba(0, 0, 0, .25);
+}
+:root[fe6-xp]:-moz-window-inactive #fe6-caption {
+  background: linear-gradient(rgba(255, 255, 255, .42), rgba(255, 255, 255, .42)), var(--fe-xp-caption) !important;
+  color: rgba(255, 255, 255, .85);
+}
+:root[fe6-xp] #fe6-caption-icon { width: 16px; height: 16px; margin-inline-end: 5px; }
+:root[fe6-xp] #fe6-caption-title {
+  font: var(--fe-xp-title-font) !important;
+  color: #ffffff;
+  text-shadow: 1px 1px rgba(0, 0, 0, .55);
+}
+:root[fe6-xp] .fe6-capbtn {
+  width: 21px; height: 21px;
+  margin: 0 0 0 2px !important;
+  border: 1px solid #ffffff !important;
+  border-radius: 3px !important;
+  box-sizing: border-box !important;
+  background-color: var(--fe-accent, var(--fe-sel));
+  background-image: var(--fe-xp-capicon),
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(to bottom, rgba(255, 255, 255, .35), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, .18)) !important;
+  background-position: center, 0 0, 0 0 !important;
+  background-size: 19px 19px, 100% 100%, 100% 100% !important;
+  background-repeat: no-repeat !important;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12), 0 0 0 1px rgba(0, 0, 0, .15) !important;
+  -moz-context-properties: fill; fill: #ffffff;
+}
+:root[fe6-xp] .fe6-capbtn:hover { filter: brightness(1.18); }
+:root[fe6-xp] .fe6-capbtn:hover:active { filter: brightness(.85); background-position: center, 0 0, 0 0 !important; }
+:root[fe6-xp] #fe6-cap-min { --fe-xp-capicon: url("icons/xp-cap-min.svg"); }
+:root[fe6-xp] #fe6-cap-max { --fe-xp-capicon: url("icons/xp-cap-max.svg"); }
+:root[fe6-xp][sizemode="maximized"] #fe6-cap-max { --fe-xp-capicon: url("icons/xp-cap-restore.svg"); }
+:root[fe6-xp] #fe6-cap-close {
+  --fe-xp-capicon: url("icons/xp-cap-close.svg");
+  background-color: #e0522c;                   /* XP's red-orange Close button, in every scheme */
+  margin-inline-start: 4px !important;
+}
+
+/* windowed: the frame is the scheme colour, like XP's blue window frame, with rounded top
+   corners; maximised: square and frameless */
+:root[fe6-xp]:is([customtitlebar], [tabsintitlebar])[fe6-caption][sizemode="normal"] body {
+  padding: 0 4px 4px !important;
+  border-radius: 8px 8px 0 0 !important;
+  background: var(--fe-face) !important;
+  box-shadow: inset 0 0 0 4px var(--fe-accent, var(--fe-sel)), inset 0 0 0 5px rgba(0, 0, 0, .25) !important;
+}
+:root[fe6-xp]:is([customtitlebar], [tabsintitlebar])[fe6-caption][sizemode="normal"] #fe6-caption {
+  margin: 0 -4px !important;
+  border-radius: 8px 8px 0 0;
+  padding-inline: 10px 8px;
+}
+:root[fe6-xp][fe6-color-pop] body { box-shadow: inset 0 0 0 3px var(--fe-accent, var(--fe-sel)) !important; }
+:root[fe6-xp][fe6-color-pop]:is([customtitlebar], [tabsintitlebar])[fe6-caption][sizemode="normal"] body {
+  box-shadow: inset 0 0 0 4px var(--fe-accent, var(--fe-sel)), inset 0 0 0 5px rgba(0, 0, 0, .25) !important;
+}
+
+/* ===================================================================== menu bar + menus */
+:root[fe6-xp] #main-menubar > menu { border-radius: 0 !important; padding: 2px 7px !important; }
+:root[fe6-xp] #main-menubar > menu:hover,
+:root[fe6-xp] #main-menubar > menu[open] {
+  background: var(--fe-sel) !important;
+  color: var(--fe-seltext) !important;
+  box-shadow: none !important;
+  padding: 2px 7px !important;
+}
+:root[fe6-xp] #fe6-throbber { background: var(--fe-window); border-inline-start: 1px solid var(--fe-xp-border); box-shadow: none; }
+:root[fe6-xp][fe6-theme] #fe6-throbber { background: var(--fe-accent) !important; }
+
+:root[fe6-xp] menupopup::part(content),
+:root[fe6-xp] menupopup > .menupopup-arrowscrollbox,
+:root[fe6-xp] panel::part(content) {
+  background: var(--fe-window) !important;
+  color: var(--fe-wintext) !important;
+  border: 1px solid var(--fe-xp-border) !important;
+  box-shadow: none !important;
+  padding: 2px !important;
+}
+:root[fe6-xp] menupopup menuitem,
+:root[fe6-xp] menupopup menu,
+:root[fe6-xp] menupopup menucaption { color: var(--fe-wintext) !important; padding: 3px 20px 3px 6px !important; }
+:root[fe6-xp] menupopup :is(menuitem, menu)[disabled] { text-shadow: none !important; color: var(--fe-graytext) !important; }
+:root[fe6-xp] menupopup menuseparator {
+  height: 1px !important; min-height: 1px !important; margin: 3px 2px !important;
+  background: var(--fe-xp-border) !important;
+}
+:root[fe6-xp] panelview, :root[fe6-xp] .panel-subview-body { background: var(--fe-window) !important; color: var(--fe-wintext) !important; }
+
+/* buttons in panels, dialogs and the sidebar: XP's rounded push buttons */
+:root[fe6-xp] :is(panel button, button.footer-button, .popup-notification-primary-button, .popup-notification-secondary-button,
+                  .dialog-button, dialog button, #sidebar-box button) {
+  border-radius: 3px !important;
+  border: 1px solid #003c74 !important;
+  background: linear-gradient(to bottom, #ffffff 0%, #f5f4ef 60%, #e3e1d6 100%) !important;
+  color: #000000 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+:root[fe6-xp] :is(panel button, button.footer-button, .dialog-button, dialog button):not([disabled]):hover {
+  box-shadow: inset 0 0 0 2px #f8b330, inset 0 -1px 0 2px #e5a01a !important;   /* XP's orange hover glow */
+}
+:root[fe6-xp] :is(panel button, button.footer-button, .dialog-button, dialog button):not([disabled]):hover:active {
+  background: linear-gradient(to bottom, #e3e1d6, #f2f1ea) !important;
+}
+:root[fe6-xp] :is(panel button, button.footer-button, .dialog-button, dialog button)[default] {
+  box-shadow: inset 0 0 0 2px #96b4ec, inset 0 -1px 0 2px #6b8edd !important;
+}
+:root[fe6-xp][fe6-scheme="dark"] :is(panel button, button.footer-button, .popup-notification-primary-button, .popup-notification-secondary-button,
+                  .dialog-button, dialog button, #sidebar-box button) {
+  border-color: #6d8fbf !important;
+  background: linear-gradient(to bottom, #55544d 0%, #4a4943 60%, #3e3d37 100%) !important;
+  color: var(--fe-text) !important;
+}
+
+/* ===================================================================== tabs (XP tab control) */
+:root[fe6-xp] .tab-background,
+:root[fe6-xp][fe6-theme] .tabbrowser-tab .tab-background {
+  border-radius: 3px 3px 0 0 !important;
+  background: var(--fe-xp-tab) !important;
+  box-shadow: inset 0 0 0 1px var(--fe-xp-tab-edge) !important;
+}
+:root[fe6-xp] .tabbrowser-tab:not([visuallyselected]):hover .tab-background {
+  /* XP's hot tab: a coloured line along the top (the scheme's colour instead of XP orange) */
+  background: linear-gradient(var(--fe-accent, var(--fe-sel)), var(--fe-accent, var(--fe-sel))) 1px 0 / calc(100% - 2px) 2px no-repeat,
+              var(--fe-xp-tab) !important;
+}
+:root[fe6-xp] .tabbrowser-tab[visuallyselected] .tab-background,
+:root[fe6-xp][fe6-theme] .tabbrowser-tab[visuallyselected] .tab-background {
+  background: linear-gradient(var(--fe-accent, var(--fe-sel)), var(--fe-accent, var(--fe-sel))) 1px 0 / calc(100% - 2px) 3px no-repeat,
+              var(--fe-window) !important;
+  box-shadow: inset 1px 0 var(--fe-xp-tab-edge), inset -1px 0 var(--fe-xp-tab-edge), inset 0 1px var(--fe-xp-tab-edge) !important;
+}
+:root[fe6-xp] .tab-close-button {
+  border-radius: 3px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+:root[fe6-xp] .tab-close-button:hover { background: #e0522c !important; fill: #ffffff !important; }
+:root[fe6-xp] #TabsToolbar toolbarbutton.toolbarbutton-1 > :is(.toolbarbutton-icon, .toolbarbutton-badge-stack),
+:root[fe6-xp] #tabbrowser-arrowscrollbox::part(scrollbutton-up),
+:root[fe6-xp] #tabbrowser-arrowscrollbox::part(scrollbutton-down) {
+  border-radius: 3px !important;
+  background: var(--fe-xp-hot) !important;
+  box-shadow: inset 0 0 0 1px var(--fe-xp-hot-edge) !important;
+}
+:root[fe6-xp] #TabsToolbar :is(#tabs-newtab-button, #new-tab-button, .tabs-newtab-button) > .toolbarbutton-icon { filter: none; }
+
+/* ===================================================================== page frame + status bar */
+:root[fe6-xp] #tabbrowser-tabpanels,
+:root[fe6-xp] #tabbrowser-tabbox > tabpanels { box-shadow: inset 0 0 0 1px var(--fe-xp-border) !important; padding: 1px !important; }
+:root[fe6-xp][fe6-color-pop] :is(#tabbrowser-tabpanels, #tabbrowser-tabbox > tabpanels) { box-shadow: none !important; padding: 0 !important; }
+:root[fe6-xp] #fe6-statusbar { border-top: 1px solid var(--fe-hi); background: var(--fe-face); }
+:root[fe6-xp] .fe6-pane { box-shadow: inset -1px 0 var(--fe-hi), inset -2px 0 var(--fe-shadow); }
+:root[fe6-xp] #fe6-status-progress { padding: 3px 4px !important; }
+:root[fe6-xp] #fe6-status-progress[active] {
+  box-shadow: inset 0 0 0 1px var(--fe-xp-border), inset -1px 0 var(--fe-hi) !important;
+  border-radius: 3px;
+}
+/* XP progress bar: glossy blocks, in the scheme's colour */
+:root[fe6-xp] #fe6-status-meter {
+  border-radius: 1px;
+  background:
+    repeating-linear-gradient(to right, transparent 0 7px, var(--fe-face) 7px 9px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--fe-progress) 35%, white) 0%, var(--fe-progress) 45%,
+                    var(--fe-progress) 60%, color-mix(in srgb, var(--fe-progress) 55%, white) 100%) !important;
+}
+:root[fe6-xp][fe6-color-pop] #fe6-status-meter {
+  background:
+    repeating-linear-gradient(to right, transparent 0 7px, rgba(0, 0, 0, .25) 7px 9px),
+    linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, .85) 50%, #ffffff 100%) !important;
+}
+:root[fe6-xp] #fe6-status-grip {
+  background:
+    radial-gradient(circle at 1px 1px, var(--fe-shadow) 1px, transparent 1.5px) 0 0 / 4px 4px;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+/* downloads panel bars and the Downloads button bar */
+:root[fe6-xp] :is(#downloadsPanel, #downloadsListBox, #downloadsRichListBox) progress,
+:root[fe6-xp] .downloadProgress {
+  border-radius: 3px !important;
+  box-shadow: inset 0 0 0 1px var(--fe-xp-border) !important;
+}
+:root[fe6-xp] :is(#downloadsPanel, #downloadsListBox, #downloadsRichListBox) progress::-moz-progress-bar,
+:root[fe6-xp] .downloadProgress::-moz-progress-bar {
+  background:
+    repeating-linear-gradient(to right, transparent 0 7px, var(--fe-window) 7px 9px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--fe-progress) 35%, white), var(--fe-progress) 50%,
+                    color-mix(in srgb, var(--fe-progress) 55%, white)) !important;
+}
+
+/* ===================================================================== sidebar */
+:root[fe6-xp] #sidebar-header {
+  background: var(--fe-xp-bar) !important;
+  box-shadow: inset 0 -1px var(--fe-shadow) !important;
+}
+:root[fe6-xp][fe6-theme] #sidebar-header {
+  background: linear-gradient(var(--fe-accent), var(--fe-accent)) left bottom / 100% 2px no-repeat, var(--fe-xp-bar) !important;
+}
+:root[fe6-xp] #downloads-button > .toolbarbutton-badge-stack > #downloads-indicator-progress-outer {
+  border-radius: 2px !important;
+  box-shadow: inset 0 0 0 1px var(--fe-xp-border) !important;
+}
+:root[fe6-xp] #downloads-button > .toolbarbutton-badge-stack > #downloads-indicator-progress-outer > #downloads-indicator-progress-inner {
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--fe-progress) 40%, white), var(--fe-progress)) !important;
+}
