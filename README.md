@@ -219,8 +219,15 @@ What it still connects to, on purpose:
 | `firefox.settings.services.mozilla.com` | Security lists: revoked certificates, blocked malicious add-ons and similar. Nothing about you is sent. |
 | `services.addons.mozilla.org` | Updates for the extensions you install. |
 | `aus5.mozilla.org`, `ciscobinary.openh264.org` | The video codec and the DRM module that Netflix, Prime Video and similar sites need. |
-| `safebrowsing.googleapis.com` | Google Safe Browsing warnings for phishing and malware sites. Only partial hashes of addresses are checked. Turn it off under **Internet Options › Privacy & Security › Block dangerous and deceptive content** if you'd rather not use Google. |
 | Your search engine | Search suggestions while you type (turn off under **Internet Options › Search**). |
+
+**Google Safe Browsing is off**, so nothing goes to Google unless you search with it. (You can
+turn it back on under **Internet Options › Privacy & Security › Block dangerous and deceptive
+content** if you want phishing and malware warnings.) Mozilla's own tracking protection is
+separate and stays on.
+
+Firefox's own accent colour (used for some of its built-in controls) is set to your Cathode
+colour scheme, so the desktop's accent colour never shows through.
 
 Sync and Mozilla accounts are only contacted if you sign in.
 

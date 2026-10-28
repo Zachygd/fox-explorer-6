@@ -77,7 +77,7 @@ def main():
     with open(os.path.join(fe6, "fe6-themes.css"), "w") as f:
         f.write("\n".join(css) + "\n")
 
-    table = [{"id": s["slug"], "name": s["name"], "grad": grad(s["title"]),
+    table = [{"id": s["slug"], "name": s["name"], "grad": grad(s["title"]), "sel": s["sel"],
               "deskLight": s["desk_light"], "deskDark": s["desk_dark"],
               "linkLight": s["link_light"], "linkDark": s["link_dark"]} for s in mod.ALL]
     boot = os.path.join(fe6, "fe6-boot.sys.mjs")

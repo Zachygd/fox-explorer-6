@@ -33,6 +33,7 @@ const THEMES = [
   "id": "cathode",
   "name": "Cathode",
   "grad": "linear-gradient(to right, #01118d 0%, #064ed8 45%, #28aff3 100%)",
+  "sel": "#064ed8",
   "deskLight": "#008080",
   "deskDark": "#004848",
   "linkLight": "#064ed8",
@@ -42,6 +43,7 @@ const THEMES = [
   "id": "brick",
   "name": "Brick",
   "grad": "linear-gradient(to right, #6b0404 0%, #cc1010 45%, #fa5e46 100%)",
+  "sel": "#cc1010",
   "deskLight": "#803030",
   "deskDark": "#421919",
   "linkLight": "#cc1010",
@@ -51,6 +53,7 @@ const THEMES = [
   "id": "pumpkin",
   "name": "Pumpkin",
   "grad": "linear-gradient(to right, #6b3104 0%, #cc6210 45%, #faac46 100%)",
+  "sel": "#ba590f",
   "deskLight": "#805330",
   "deskDark": "#422b19",
   "linkLight": "#b2550e",
@@ -60,6 +63,7 @@ const THEMES = [
   "id": "wheat",
   "name": "Wheat",
   "grad": "linear-gradient(to right, #6b5304 0%, #cca010 45%, #fae846 100%)",
+  "sel": "#91720b",
   "deskLight": "#806d30",
   "deskDark": "#423919",
   "linkLight": "#876a0a",
@@ -69,6 +73,7 @@ const THEMES = [
   "id": "ember",
   "name": "Ember",
   "grad": "linear-gradient(to right, #6b1904 0%, #cc3610 45%, #fa8246 100%)",
+  "sel": "#cc3610",
   "deskLight": "#804030",
   "deskDark": "#422119",
   "linkLight": "#cc3610",
@@ -78,6 +83,7 @@ const THEMES = [
   "id": "spruce",
   "name": "Spruce",
   "grad": "linear-gradient(to right, #046b27 0%, #10cc4f 45%, #46fa9a 100%)",
+  "sel": "#0b8734",
   "deskLight": "#30804b",
   "deskDark": "#194227",
   "linkLight": "#0a7f31",
@@ -87,6 +93,7 @@ const THEMES = [
   "id": "meadow",
   "name": "Meadow",
   "grad": "linear-gradient(to right, #3b6b04 0%, #74cc10 45%, #8efa46 100%)",
+  "sel": "#4b850a",
   "deskLight": "#5b8030",
   "deskDark": "#2f4219",
   "linkLight": "#457b09",
@@ -96,6 +103,7 @@ const THEMES = [
   "id": "marine",
   "name": "Marine",
   "grad": "linear-gradient(to right, #046b49 0%, #10cc8d 45%, #46fad6 100%)",
+  "sel": "#0b875d",
   "deskLight": "#308065",
   "deskDark": "#194235",
   "linkLight": "#0a7f58",
@@ -105,6 +113,7 @@ const THEMES = [
   "id": "teal",
   "name": "Teal",
   "grad": "linear-gradient(to right, #04616b 0%, #10b9cc 45%, #46d0fa 100%)",
+  "sel": "#0b818f",
   "deskLight": "#307880",
   "deskDark": "#193e42",
   "linkLight": "#0a7a87",
@@ -114,6 +123,7 @@ const THEMES = [
   "id": "plum",
   "name": "Plum",
   "grad": "linear-gradient(to right, #5a046b 0%, #ad10cc 45%, #f446fa 100%)",
+  "sel": "#ad10cc",
   "deskLight": "#723080",
   "deskDark": "#3b1942",
   "linkLight": "#ad10cc",
@@ -123,6 +133,7 @@ const THEMES = [
   "id": "eggplant",
   "name": "Eggplant",
   "grad": "linear-gradient(to right, #2d046b 0%, #5b10cc 45%, #a646fa 100%)",
+  "sel": "#5b10cc",
   "deskLight": "#503080",
   "deskDark": "#2a1942",
   "linkLight": "#5b10cc",
@@ -132,6 +143,7 @@ const THEMES = [
   "id": "rose",
   "name": "Rose",
   "grad": "linear-gradient(to right, #6b043f 0%, #cc107b 45%, #fa4694 100%)",
+  "sel": "#cc107b",
   "deskLight": "#80305d",
   "deskDark": "#421930",
   "linkLight": "#cc107b",
@@ -141,6 +153,7 @@ const THEMES = [
   "id": "storm",
   "name": "Storm",
   "grad": "linear-gradient(to right, #040b6b 0%, #101dcc 45%, #5246fa 100%)",
+  "sel": "#101dcc",
   "deskLight": "#303680",
   "deskDark": "#191c42",
   "linkLight": "#101dcc",
@@ -150,6 +163,7 @@ const THEMES = [
   "id": "slate",
   "name": "Slate",
   "grad": "linear-gradient(to right, #323538 0%, #676d73 45%, #bbc1c7 100%)",
+  "sel": "#5e656b",
   "deskLight": "#697480",
   "deskDark": "#2a2e33",
   "linkLight": "#5e656b",
@@ -159,6 +173,7 @@ const THEMES = [
   "id": "spectrum",
   "name": "Spectrum",
   "grad": "linear-gradient(to right, #b40a14 0%, #d2640a 22%, #b49600 42%, #1e9628 60%, #1450c8 80%, #7a32d2 100%)",
+  "sel": "#1450c8",
   "deskLight": "#2e5478",
   "deskDark": "#12243a",
   "linkLight": "#1450c8",
@@ -168,6 +183,7 @@ const THEMES = [
   "id": "sunset",
   "name": "Sunset",
   "grad": "linear-gradient(to right, #4a0a3e 0%, #c0144e 40%, #e8501e 75%, #ffa03c 100%)",
+  "sel": "#c0144e",
   "deskLight": "#7a3a4c",
   "deskDark": "#2e141c",
   "linkLight": "#c0144e",
@@ -288,6 +304,23 @@ const BASE_LABEL = "Cathode";   // "classic": Cathode's standard colours, withou
 
 function setTheme(value) {
   Services.prefs.setStringPref(PREF.theme, value);
+}
+
+/* Firefox paints some of its own controls (separators' edges, drop indicators, checkboxes,
+   focus rings, primary buttons) with the desktop's accent colour - in KDE that can be any
+   colour at all. Point Firefox's accent at the current Cathode colour scheme instead. Set on
+   the default branch, so ui.accentcolor in about:config still wins if you set it yourself. */
+function syncAccentColor() {
+  try {
+    const id = currentTheme() === "classic" ? "cathode" : currentTheme();
+    const t = THEMES.find(x => x.id === id);
+    if (!t?.sel) return;
+    const def = Services.prefs.getDefaultBranch("");
+    def.setStringPref("ui.accentcolor", t.sel);
+    def.setStringPref("ui.accentcolortext", "#ffffff");
+  } catch (e) {
+    log("accent colour", e);
+  }
 }
 
 /* Put the theme on a document: <html fe6-theme="teal"> selects its palette in fe6-themes.css
@@ -1198,6 +1231,7 @@ export const FoxExplorer6 = {
     } catch (e) {}
     applyGlobalScheme();
     registerGlobalSheets();
+    syncAccentColor();
 
     Services.obs.addObserver(subject => {
       const doc = subject;
@@ -1247,6 +1281,7 @@ export const FoxExplorer6 = {
         }
         if (data === PREF.caption) syncTitlebarPref();
         if (data === PREF.theme || data === PREF.scheme) {
+          syncAccentColor();
           registerGlobalSheets();
           applyThemeEverywhere();
         }

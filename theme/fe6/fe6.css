@@ -825,7 +825,7 @@ menupopup menuitem[type="radio"][checked="true"] > .menu-check { list-style-imag
 }
 #PlacesChevron > .toolbarbutton-icon {
   list-style-image: inherit !important;
-  filter: none !important; opacity: 1 !important; visibility: visible !important;
+  filter: none !important; opacity: 1 !important;
   width: 16px !important; height: 16px !important; padding: 0 !important;
   background: transparent !important; box-shadow: none !important; border-radius: 0 !important;
 }
@@ -979,6 +979,39 @@ sidebar-main, #sidebar-main {
 /* in colour while it works, like a hot-tracked button */
 #nav-bar #downloads-button[progress] #downloads-indicator-icon,
 #nav-bar #downloads-button[progress] #downloads-indicator-anchor { filter: none !important; }
+
+/* Lay the button out explicitly, so it comes out the same on every Firefox version: one centred
+   22x22 cell for the icon; while downloading, a second row under it for the progress bar, with
+   the icon moved up so the bar never covers it. */
+#nav-bar #downloads-button > .toolbarbutton-badge-stack {
+  display: grid !important;
+  grid-template-columns: 22px !important;
+  grid-template-rows: 22px !important;
+  justify-content: center !important;
+  align-content: center !important;
+  place-items: center !important;
+}
+#nav-bar #downloads-button > .toolbarbutton-badge-stack > * {
+  grid-area: 1 / 1 !important;
+  position: static !important;
+  inset: auto !important;
+  translate: none !important;
+  margin: 0 !important;
+}
+#nav-bar #downloads-button > .toolbarbutton-badge-stack > .toolbarbutton-badge {
+  justify-self: end !important; align-self: start !important;
+  margin: -4px -6px 0 0 !important;
+}
+#nav-bar #downloads-button[progress] > .toolbarbutton-badge-stack {
+  grid-template-rows: 22px 5px !important;
+  row-gap: 1px !important;
+  padding-block: 0 !important;
+}
+#nav-bar #downloads-button[progress] > .toolbarbutton-badge-stack > #downloads-indicator-progress-outer {
+  grid-area: 2 / 1 !important;
+  align-self: stretch !important; justify-self: stretch !important;
+  width: 22px !important; height: 5px !important;
+}
 
 /* the downloads panel (and Library > Downloads) progress bars: Windows 98 sunken bar with blocks */
 :is(#downloadsPanel, #downloadsListBox, #downloadsRichListBox) progress,
