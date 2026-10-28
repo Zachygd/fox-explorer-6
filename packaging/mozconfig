@@ -12,5 +12,8 @@ ac_add_options MOZ_APP_REMOTINGNAME=foxexplorer6
 # updates come from re-running the build (or your package manager)
 ac_add_options --disable-updater
 ac_add_options --disable-crashreporter
+# no telemetry: source builds aren't MOZILLA_OFFICIAL, so telemetry upload isn't compiled in;
+# the prefs and policies Fox Explorer installs keep everything else (studies, sponsored content,
+# background pings) off as well. See README "Privacy".
 ac_add_options --disable-tests
 mk_add_options MOZ_OBJDIR=@TOPSRCDIR@/obj-foxexplorer6

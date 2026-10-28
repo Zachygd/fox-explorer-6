@@ -64,6 +64,7 @@ tar -C "$WORK" -xf "$PKG"
 APP="$WORK/foxexplorer6"
 echo "==> installing the IE6 chrome layer"
 "$HERE/scripts/apply-layer.sh" "$APP"
+install -D -m 0644 "$HERE/distribution/policies.json" "$APP/distribution/policies.json"
 TARBALL_OUT="$("$HERE/scripts/package.sh" "$APP" "$VERSION" "$ARCH" "$HERE/dist")"
 echo "    $TARBALL_OUT"
 if [ "$RPM" = 1 ]; then "$HERE/scripts/build-rpm.sh" "$TARBALL_OUT" "$VERSION"; fi

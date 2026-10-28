@@ -36,6 +36,8 @@ every modern setting work as normal. Only the look changes:
   the scheme's colour.
 - **Light/Dark mode:** every scheme comes in light and dark (Cathode's dark grays), or
   **Use System Setting** to follow your desktop. Websites that support dark mode follow it.
+- **No telemetry:** Mozilla's data collection, studies, sponsored content and background
+  check-ins are switched off (see [Privacy](#privacy)).
 - **Downloads:** while a file downloads, the Downloads button plays a Windows 98 style animation
   (a page flying from the globe into the folder) with a small block progress bar under it.
 
@@ -187,11 +189,38 @@ Your own `userChrome.css` still works on top (`toolkit.legacyUserProfileCustomiz
   `foxexplorer6` launcher gives Fox Explorer a small GTK theme of its own, made from your current
   one minus that frame, so the window's edge is Fox Explorer's own Win98 (or Color Pop) frame.
   Other apps aren't affected. Set `FE6_KEEP_GTK_FRAME=1` to keep the GTK frame.
-- The quick build uses Mozilla's official binary, so Mozilla's telemetry defaults apply. You can
-  turn them off under **Internet Options › Privacy & Security**. Source builds made with unofficial
-  branding don't send telemetry.
+- **Privacy:** see below — Fox Explorer sends nothing to Mozilla about how you use it.
 - Fox Explorer 6 is an unofficial project, not affiliated with Mozilla or Microsoft. Firefox is a
   trademark of the Mozilla Foundation, and Internet Explorer and Windows are trademarks of
   Microsoft. Released under the **MPL-2.0** ([LICENSE](LICENSE)), like Firefox. The SE98 icons in
   [`theme/fe6/se98/`](theme/fe6/se98) are by nestoris and stay under their own licence, the
   **GPL-2.0** ([theme/fe6/se98/LICENSE](theme/fe6/se98/LICENSE)).
+
+### Privacy
+
+Fox Explorer has Mozilla's data collection switched off and locked, on both the quick build and
+source builds:
+
+- **No telemetry**: no usage data, health reports, daily pings, crash reports or ad attribution
+  are sent to Mozilla. The "sends some data to Mozilla" bar never appears.
+- **No studies or experiments**: Mozilla can't remotely enrol Fox Explorer in tests (Normandy,
+  Nimbus).
+- **No sponsored content**: no sponsored shortcuts, Pocket stories, sponsored Address bar
+  suggestions, weather or trending searches, add-on recommendations or Mozilla promos.
+- **No background check-ins**: no region lookup, no captive-portal checks every few minutes, and
+  no always-open connection to Mozilla's push server. (Turn these back on in about:config if you
+  need them: `network.captive-portal-service.enabled` helps with hotel/airport Wi-Fi sign-in
+  pages, `dom.push.connection.enabled` lets websites send you push notifications.)
+
+What it still connects to, on purpose:
+
+| Server | Why |
+|---|---|
+| `firefox.settings.services.mozilla.com` | Security lists: revoked certificates, blocked malicious add-ons and similar. Nothing about you is sent. |
+| `services.addons.mozilla.org` | Updates for the extensions you install. |
+| `aus5.mozilla.org`, `ciscobinary.openh264.org` | The video codec and the DRM module that Netflix, Prime Video and similar sites need. |
+| `safebrowsing.googleapis.com` | Google Safe Browsing warnings for phishing and malware sites. Only partial hashes of addresses are checked. Turn it off under **Internet Options › Privacy & Security › Block dangerous and deceptive content** if you'd rather not use Google. |
+| Your search engine | Search suggestions while you type (turn off under **Internet Options › Search**). |
+
+Sync and Mozilla accounts are only contacted if you sign in.
+
